@@ -29,7 +29,7 @@ export default function JournalPage() {
     loadEntries();
   }, []);
 
-  async function handleSubmit(analysisPromise: Promise<{ data: AnalyzeMoodOutput | null; error: string | null }>, journalEntry?: string) {
+  async function handleSubmit(analysisPromise: Promise<{ data: AnalyzeMoodOutput | null; error: string | null }>, journalEntryText?: string) {
     setIsSubmitting(true);
     setCurrentResult(null);
 
@@ -48,23 +48,36 @@ export default function JournalPage() {
     if (result.data) {
       setCurrentResult(result.data);
       
-      saveJournalEntry({
-        journalEntry: journalEntry || `Facial analysis on ${new Date().toLocaleString()}`,
+      const newEntryData = {
+        journalEntry: journalEntryText || `Facial analysis on ${new Date().toLocaleString()}`,
         mood: result.data.mood,
         mentalSolution: result.data.mentalSolution,
         physicalActivity: result.data.physicalActivity,
         emergencyMessage: result.data.emergencyMessage,
-      }).then(saveResult => {
-        if (saveResult.success) {
-          getJournalEntries().then(fetchedEntries => {
-            setEntries(fetchedEntries);
-          });
-        } else {
+      };
+
+      // Optimistic UI update
+      const optimisticEntry: JournalEntry = {
+        ...newEntryData,
+        id: `optimistic-${Date.now()}`,
+        createdAt: new Date(),
+      };
+      setEntries(prevEntries => [optimisticEntry, ...prevEntries]);
+
+      saveJournalEntry(newEntryData).then(saveResult => {
+        if (!saveResult.success) {
            toast({
               variant: 'destructive',
               title: 'Database Error',
               description: saveResult.error,
           });
+          // Revert optimistic update on failure
+          setEntries(prevEntries => prevEntries.filter(e => e.id !== optimisticEntry.id));
+        } else {
+            // Optionally, you could re-fetch to get the real ID and timestamp,
+            // but for a faster UI, we can just continue with the optimistic one.
+            // For this app, the optimistic data is sufficient.
+            getJournalEntries().then(setEntries); // Refresh list with real data from DB
         }
       });
     }
