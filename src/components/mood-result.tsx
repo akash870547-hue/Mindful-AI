@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useRef } from 'react';
 import {
   Card,
   CardContent,
@@ -5,10 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Mood, MoodIcons } from '@/components/icons';
 import { AnalyzeMoodOutput } from '@/ai/flows/analyze-mood-and-suggest-coping-tip';
-import { Lightbulb } from 'lucide-react';
+import { Lightbulb, Volume2, Loader2, StopCircle } from 'lucide-react';
+import { getSpeech } from '@/app/actions';
+import { useToast } from '@/hooks/use-toast';
 
 interface MoodResultProps {
   result: AnalyzeMoodOutput | null;
@@ -22,75 +28,134 @@ const moodTextClass: Record<Mood, string> = {
 };
 
 export function MoodResult({ result, isLoading }: MoodResultProps) {
-  if (isLoading) {
-    return (
-      <Card className="shadow-lg">
-        <CardHeader>
-          <div className="flex items-center gap-4">
-            <Skeleton className="h-10 w-10 rounded-full" />
-            <div className="space-y-2">
-              <Skeleton className="h-7 w-48" />
-              <Skeleton className="h-5 w-64" />
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Skeleton className="h-6 w-32" />
-            <Skeleton className="h-5 w-full" />
-            <Skeleton className="h-5 w-5/6" />
-          </div>
-        </CardContent>
-      </Card>
-    );
+  const [isGeneratingSpeech, setIsGeneratingSpeech] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { toast } = useToast();
+
+  async function handlePlayAudio() {
+    if (!result) return;
+
+    if (audioRef.current && audioRef.current.src) {
+      if (isPlaying) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+        setIsPlaying(false);
+      } else {
+        audioRef.current.play();
+        setIsPlaying(true);
+      }
+      return;
+    }
+
+    setIsGeneratingSpeech(true);
+    const textToRead = `Your mood has been analyzed as ${result.mood}. Here is a coping tip for you: ${result.copingTip}`;
+    const speechResult = await getSpeech(textToRead);
+    setIsGeneratingSpeech(false);
+
+    if (speechResult.error) {
+      toast({
+        variant: 'destructive',
+        title: 'Audio Error',
+        description: speechResult.error,
+      });
+    } else if (speechResult.data) {
+      if (audioRef.current) {
+        audioRef.current.src = speechResult.data.audioDataUri;
+        audioRef.current.play();
+        setIsPlaying(true);
+      }
+    }
   }
 
-  if (!result) {
-    return (
-      <Card className="flex min-h-[260px] flex-col items-center justify-center border-2 border-dashed bg-transparent text-center shadow-none">
-        <CardHeader>
-          <CardTitle className="font-headline text-muted-foreground">
-            Your Analysis Appears Here
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            Submit a journal entry and I'll help you understand your mood.
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const mood = result.mood as Mood;
-  const Icon = MoodIcons[mood];
+  const mood = result?.mood as Mood;
+  const Icon = result ? MoodIcons[mood] : null;
 
   return (
-    <Card className="bg-accent/50 shadow-lg">
-      <CardHeader>
-        <div className="flex items-center gap-4">
-          <Icon className={`h-10 w-10 shrink-0 ${moodTextClass[mood]}`} />
-          <div>
-            <CardTitle className="font-headline text-3xl">
-              Analysis: <span className={moodTextClass[mood]}>{mood}</span>
+    <>
+      <audio
+        ref={audioRef}
+        onEnded={() => setIsPlaying(false)}
+        className="hidden"
+      />
+      {isLoading ? (
+        <Card className="shadow-lg">
+          <CardHeader>
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-10 w-10 rounded-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-7 w-48" />
+                <Skeleton className="h-5 w-64" />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Skeleton className="h-6 w-32" />
+              <Skeleton className="h-5 w-full" />
+              <Skeleton className="h-5 w-5/6" />
+            </div>
+          </CardContent>
+        </Card>
+      ) : !result || !Icon ? (
+        <Card className="flex min-h-[260px] flex-col items-center justify-center border-2 border-dashed bg-transparent text-center shadow-none">
+          <CardHeader>
+            <CardTitle className="font-headline text-muted-foreground">
+              Your Analysis Appears Here
             </CardTitle>
-            <CardDescription>
-              Here's what I gathered from your entry.
-            </CardDescription>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <h3 className="mb-2 flex items-center gap-2 font-headline text-xl font-semibold">
-            <Lightbulb className="h-6 w-6 text-primary" />
-            Coping Tip
-          </h3>
-          <p className="leading-relaxed text-card-foreground/90">
-            {result.copingTip}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">
+              Submit a journal entry and I'll help you understand your mood.
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="bg-accent/50 shadow-lg">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Icon className={`h-10 w-10 shrink-0 ${moodTextClass[mood]}`} />
+                <div>
+                  <CardTitle className="font-headline text-3xl">
+                    Analysis: <span className={moodTextClass[mood]}>{mood}</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Here's what I gathered from your entry.
+                  </CardDescription>
+                </div>
+              </div>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={handlePlayAudio}
+                disabled={isGeneratingSpeech}
+                className="h-12 w-12 shrink-0 rounded-full"
+              >
+                {isGeneratingSpeech ? (
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                ) : isPlaying ? (
+                  <StopCircle className="h-7 w-7" />
+                ) : (
+                  <Volume2 className="h-7 w-7" />
+                )}
+                <span className="sr-only">Read analysis aloud</span>
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <h3 className="mb-2 flex items-center gap-2 font-headline text-xl font-semibold">
+                <Lightbulb className="h-6 w-6 text-primary" />
+                Coping Tip
+              </h3>
+              <p className="leading-relaxed text-card-foreground/90">
+                {result.copingTip}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </>
   );
 }
