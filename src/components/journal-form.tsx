@@ -89,6 +89,12 @@ export function JournalForm({ onSubmit, isSubmitting }: JournalFormProps) {
     };
 
     recognition.onerror = (event: any) => {
+      // Ignore the 'no-speech' error, which is common if the user doesn't speak.
+      if (event.error === 'no-speech') {
+        setIsRecording(false);
+        return;
+      }
+
       console.error('Speech recognition error', event.error);
       if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
         toast({
