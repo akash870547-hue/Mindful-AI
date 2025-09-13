@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { Camera, Loader2 } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Camera, Loader2, Video, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
@@ -15,47 +15,55 @@ interface FacialAnalysisProps {
 }
 
 export function FacialAnalysis({ onSubmit, isSubmitting }: FacialAnalysisProps) {
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { toast } = useToast();
 
+  const stopCamera = useCallback(() => {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+      setIsCameraOpen(false);
+       if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+    }
+  }, [stream]);
+
+  const getCameraPermission = async () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setHasCameraPermission(false);
+      toast({
+        variant: 'destructive',
+        title: 'Camera Not Supported',
+        description: 'Your browser does not support camera access.',
+      });
+      return;
+    }
+    try {
+      const cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+      setStream(cameraStream);
+      setHasCameraPermission(true);
+      setIsCameraOpen(true);
+    } catch (error) {
+      console.error('Error accessing camera:', error);
+      setHasCameraPermission(false);
+      setIsCameraOpen(false);
+      toast({
+        variant: 'destructive',
+        title: 'Camera Access Denied',
+        description: 'Please enable camera permissions in your browser settings to use this app.',
+      });
+    }
+  };
+
   useEffect(() => {
-    const getCameraPermission = async () => {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setHasCameraPermission(false);
-        toast({
-          variant: 'destructive',
-          title: 'Camera Not Supported',
-          description: 'Your browser does not support camera access.',
-        });
-        return;
-      }
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        setHasCameraPermission(true);
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      } catch (error) {
-        console.error('Error accessing camera:', error);
-        setHasCameraPermission(false);
-        toast({
-          variant: 'destructive',
-          title: 'Camera Access Denied',
-          description: 'Please enable camera permissions in your browser settings to use this app.',
-        });
-      }
-    };
-
-    getCameraPermission();
-
-    return () => {
-      if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, [toast]);
+    if (stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
+    }
+  }, [stream]);
 
   const handleAnalyzeFace = async () => {
     if (!videoRef.current) {
@@ -74,8 +82,21 @@ export function FacialAnalysis({ onSubmit, isSubmitting }: FacialAnalysisProps) 
     if (context) {
       context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
       const imageDataUri = canvas.toDataURL('image/jpeg');
+      stopCamera();
       onSubmit(analyzeFaceExpressionAction(imageDataUri));
     }
+  };
+
+  const handleOpenCamera = () => {
+    if (hasCameraPermission === false) {
+      toast({
+        variant: 'destructive',
+        title: 'Camera Access Denied',
+        description: 'Please enable camera permissions in your browser settings and try again.',
+      });
+      return;
+    }
+    getCameraPermission();
   };
 
   return (
@@ -85,42 +106,56 @@ export function FacialAnalysis({ onSubmit, isSubmitting }: FacialAnalysisProps) 
         <CardDescription>Let the AI analyze your facial expression for a quick mood check.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="relative aspect-video w-full overflow-hidden rounded-md border bg-muted">
-            <video ref={videoRef} className="h-full w-full object-cover" autoPlay muted playsInline />
-            {hasCameraPermission === false && (
-                 <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                    <p className="text-white">Camera access denied or not available.</p>
+        {isCameraOpen ? (
+          <>
+            <div className="relative aspect-video w-full overflow-hidden rounded-md border bg-muted">
+              <video ref={videoRef} className="h-full w-full object-cover" autoPlay muted playsInline />
+              {!stream && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                 </div>
-            )}
-            {hasCameraPermission === null && (
-                 <div className="absolute inset-0 flex items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                </div>
-            )}
-        </div>
+              )}
+            </div>
+            
+            <Button onClick={handleAnalyzeFace} disabled={isSubmitting || !stream} className="w-full text-lg py-6">
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Analyzing Face...
+                </>
+              ) : (
+                <>
+                  <Camera className="mr-2 h-5 w-5" />
+                  Analyze My Expression
+                </>
+              )}
+            </Button>
+            <Button onClick={stopCamera} variant="outline" className="w-full">
+              <X className="mr-2 h-5 w-5" />
+              Close Camera
+            </Button>
+          </>
+        ) : (
+          <>
+            <div className="flex aspect-video w-full flex-col items-center justify-center rounded-md border-2 border-dashed bg-muted/50">
+              <Video className="h-16 w-16 text-muted-foreground" />
+              <p className="mt-2 text-muted-foreground">Camera is off</p>
+            </div>
+            <Button onClick={handleOpenCamera} disabled={isSubmitting} className="w-full text-lg py-6">
+              <Camera className="mr-2 h-5 w-5" />
+              Analyze with Camera
+            </Button>
+          </>
+        )}
 
         {hasCameraPermission === false && (
-          <Alert variant="destructive">
+          <Alert variant="destructive" className="mt-4">
             <AlertTitle>Camera Access Required</AlertTitle>
             <AlertDescription>
-              Please allow camera access in your browser settings to use this feature.
+              Please allow camera access in your browser settings to use this feature. You may need to reload the page after granting permission.
             </AlertDescription>
           </Alert>
         )}
-        
-        <Button onClick={handleAnalyzeFace} disabled={isSubmitting || !hasCameraPermission} className="w-full text-lg py-6">
-          {isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              Analyzing Face...
-            </>
-          ) : (
-            <>
-              <Camera className="mr-2 h-5 w-5" />
-              Analyze My Expression
-            </>
-          )}
-        </Button>
       </CardContent>
     </Card>
   );
