@@ -56,7 +56,7 @@ export default function JournalPage() {
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-3">
             <BookText className="h-7 w-7 text-primary" />
-            <h1 className="font-headline text-2xl font-bold">Mindful AI</h1>
+            <h1 className="font-headline text-2xl font-bold">Mental Health AI Companion</h1>
           </div>
           <nav className="flex items-center gap-2">
             <Button variant="ghost" asChild>

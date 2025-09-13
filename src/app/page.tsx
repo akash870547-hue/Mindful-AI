@@ -12,7 +12,7 @@ export default function Home() {
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-3">
             <BookText className="h-7 w-7 text-primary" />
-            <h1 className="font-headline text-2xl font-bold">Mindful AI</h1>
+            <h1 className="font-headline text-2xl font-bold">Mental Health AI Companion</h1>
           </div>
         </div>
       </header>
@@ -24,7 +24,7 @@ export default function Home() {
                 Your Personal AI Companion for Mental Wellness
               </h2>
               <p className="max-w-xl text-lg text-muted-foreground md:text-xl">
-                Mindful AI helps you understand your emotions, one journal entry
+                This app helps you understand your emotions, one journal entry
                 at a time. Write down your thoughts, and our AI will provide
                 gentle analysis and coping tips to support your mental wellness
                 journey.
@@ -51,7 +51,7 @@ export default function Home() {
           <div className="container mx-auto px-4">
             <div className="mx-auto max-w-3xl text-center">
               <h3 className="font-headline text-3xl font-bold tracking-tighter sm:text-4xl">
-                How Mindful AI Supports You
+                How This App Supports You
               </h3>
               <p className="mt-4 text-lg text-muted-foreground">
                 Discover a new way to engage with your thoughts and feelings.
