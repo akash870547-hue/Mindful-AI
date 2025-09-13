@@ -143,12 +143,12 @@ export function JournalForm({ onSubmit, isSubmitting }: JournalFormProps) {
 
 
   const handleFormSubmit = (data: JournalFormValues) => {
-    onSubmit(data);
-    if(isRecording) {
-        recognitionRef.current.stop();
-        setIsRecording(false);
+    if (isRecording) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
     }
     finalTranscriptRef.current = '';
+    onSubmit(data);
     form.reset();
   };
 
