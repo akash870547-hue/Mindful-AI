@@ -13,29 +13,20 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-
-// Mock entries for chart demonstration
-const mockEntries: JournalEntry[] = [
-    { id: '1', createdAt: new Date('2024-07-20'), mood: 'Mild', journalEntry: '', copingTip: '' },
-    { id: '2', createdAt: new Date('2024-07-21'), mood: 'Moderate', journalEntry: '', copingTip: '' },
-    { id: '3', createdAt: new Date('2024-07-22'), mood: 'Severe', journalEntry: '', copingTip: '' },
-    { id: '4', createdAt: new Date('2024-07-23'), mood: 'Mild', journalEntry: '', copingTip: '' },
-    { id: '5', createdAt: new Date('2024-07-24'), mood: 'Moderate', journalEntry: '', copingTip: '' },
-    { id: '6', createdAt: new Date('2024-07-25'), mood: 'Mild', journalEntry: '', copingTip: '' },
-    { id: '7', createdAt: new Date('2024-07-26'), mood: 'Severe', journalEntry: '', copingTip: '' },
-];
+import { getJournalEntries } from '@/app/actions';
 
 export default function ProgressPage() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // This is where you would fetch data from a database.
-    // For now, we'll use mock data to demonstrate the chart.
-    setTimeout(() => {
-        setEntries(mockEntries);
-        setIsLoading(false);
-    }, 1000)
+    async function loadEntries() {
+      setIsLoading(true);
+      const fetchedEntries = await getJournalEntries();
+      setEntries(fetchedEntries.reverse()); // Reverse to show oldest first on the chart
+      setIsLoading(false);
+    }
+    loadEntries();
   }, []);
 
   return (

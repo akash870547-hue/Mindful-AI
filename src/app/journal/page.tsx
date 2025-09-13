@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BookText } from 'lucide-react';
 import { JournalForm } from '@/components/journal-form';
 import { MoodResult } from '@/components/mood-result';
 import { PastEntriesList } from '@/components/past-entries';
-import { analyzeEntry } from '@/app/actions';
+import { analyzeEntry, getJournalEntries } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { JournalEntry } from '@/lib/types';
 import type { AnalyzeMoodOutput } from '@/ai/flows/analyze-mood-and-suggest-coping-tip';
@@ -21,6 +21,14 @@ export default function JournalPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
+  useEffect(() => {
+    async function loadEntries() {
+      const fetchedEntries = await getJournalEntries();
+      setEntries(fetchedEntries);
+    }
+    loadEntries();
+  }, []);
+
   async function handleJournalSubmit(data: { journalEntry: string }) {
     setIsSubmitting(true);
     setCurrentResult(null);
@@ -35,13 +43,9 @@ export default function JournalPage() {
       });
     } else if (result.data) {
       setCurrentResult(result.data);
-      const newEntry: JournalEntry = {
-        id: new Date().toISOString(),
-        createdAt: new Date(),
-        journalEntry: data.journalEntry,
-        ...result.data,
-      };
-      setEntries(prev => [newEntry, ...prev]);
+      // Refresh entries from the database
+      const fetchedEntries = await getJournalEntries();
+      setEntries(fetchedEntries);
     }
     setIsSubmitting(false);
   }

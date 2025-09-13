@@ -9,6 +9,9 @@ import {
   textToSpeech,
   TextToSpeechOutput,
 } from '@/ai/flows/text-to-speech';
+import { db } from '@/lib/firebase/firebase';
+import { JournalEntry, JournalEntryFromDb } from '@/lib/types';
+import { collection, addDoc, getDocs, serverTimestamp, orderBy, query } from 'firebase/firestore';
 
 export async function analyzeEntry(
   journalEntry: string
@@ -22,6 +25,13 @@ export async function analyzeEntry(
 
   try {
     const result = await analyzeMoodAndSuggestCopingTip({ journalEntry });
+    // Also save to database
+    if (result) {
+      await addJournalEntry({
+        journalEntry,
+        ...result,
+      });
+    }
     return { data: result, error: null };
   } catch (e) {
     console.error(e);
@@ -51,4 +61,34 @@ export async function getSpeech(
         "Sorry, I couldn't generate audio right now. Please try again later.",
     };
   }
+}
+
+export async function addJournalEntry(entry: Omit<JournalEntry, 'id' | 'createdAt'>) {
+    try {
+        await addDoc(collection(db, 'journalEntries'), {
+            ...entry,
+            createdAt: serverTimestamp(),
+        });
+    } catch (error) {
+        console.error('Error adding document: ', error);
+        throw new Error('Could not save journal entry.');
+    }
+}
+
+export async function getJournalEntries(): Promise<JournalEntry[]> {
+    try {
+        const q = query(collection(db, "journalEntries"), orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data() as JournalEntryFromDb;
+            return {
+                id: doc.id,
+                ...data,
+                createdAt: data.createdAt.toDate(),
+            };
+        });
+    } catch (error) {
+        console.error('Error getting documents: ', error);
+        return [];
+    }
 }
