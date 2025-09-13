@@ -1,9 +1,9 @@
 'use server';
 
 /**
- * @fileOverview Analyzes user's journal entry to detect mood and suggest a coping tip.
+ * @fileOverview Analyzes user's journal entry to detect mood and suggest coping strategies.
  *
- * - analyzeMoodAndSuggestCopingTip - A function that handles the mood analysis and coping tip suggestion process.
+ * - analyzeMoodAndSuggestCopingTip - A function that handles the mood analysis and coping suggestion process.
  * - AnalyzeMoodInput - The input type for the analyzeMoodAndSuggestCopingTip function.
  * - AnalyzeMoodOutput - The return type for the analyzeMoodAndSuggestCopingTip function.
  */
@@ -12,7 +12,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const AnalyzeMoodInputSchema = z.object({
-  journalEntry: z.string().describe('The user\'s journal entry for the day.'),
+  journalEntry: z.string().describe("The user's journal entry for the day."),
 });
 export type AnalyzeMoodInput = z.infer<typeof AnalyzeMoodInputSchema>;
 
@@ -20,7 +20,20 @@ const AnalyzeMoodOutputSchema = z.object({
   mood: z
     .enum(['Mild', 'Moderate', 'Severe'])
     .describe('The detected mood of the user (Mild, Moderate, or Severe).'),
-  copingTip: z.string().describe('A short, relevant coping tip for the user.'),
+  mentalSolution: z
+    .string()
+    .describe('A short, relevant mental solution or coping tip for the user.'),
+  physicalActivity: z
+    .string()
+    .describe(
+      'A simple physical activity suggestion (e.g., breathing exercise, walk, yoga).'
+    ),
+  emergencyMessage: z
+    .string()
+    .optional()
+    .describe(
+      'An empathetic emergency alert message, only to be provided if the mood is detected as "Severe".'
+    ),
 });
 export type AnalyzeMoodOutput = z.infer<typeof AnalyzeMoodOutputSchema>;
 
@@ -34,7 +47,12 @@ const prompt = ai.definePrompt({
   name: 'analyzeMoodPrompt',
   input: {schema: AnalyzeMoodInputSchema},
   output: {schema: AnalyzeMoodOutputSchema},
-  prompt: `Analyze the following journal entry and detect the user's mood (Mild, Moderate, or Severe). Based on the detected mood, suggest one short, relevant coping tip.
+  prompt: `Analyze the following journal entry to detect the user's mood, categorizing it as "Mild", "Moderate", or "Severe" distress.
+
+Based on the mood, provide:
+1.  A short, actionable mental solution (like a mindfulness exercise or a coping strategy).
+2.  A simple, accessible physical activity suggestion (e.g., a 5-minute walk, stretching, breathing exercise).
+3.  If and ONLY IF the mood is "Severe", include a gentle and empathetic emergency alert message. For "Mild" or "Moderate" moods, this field must be omitted.
 
 Journal Entry: {{{journalEntry}}}
 

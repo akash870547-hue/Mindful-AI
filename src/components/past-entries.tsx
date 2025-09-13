@@ -66,14 +66,32 @@ export function PastEntriesList({ entries }: PastEntriesListProps) {
                         {entry.journalEntry}
                       </p>
                     </div>
-                    <div>
+                     <div>
                       <h4 className="mb-1 font-headline text-lg font-semibold">
-                        Suggested Tip
+                        Mental Solution
                       </h4>
                       <p className="leading-relaxed text-muted-foreground">
-                        {entry.copingTip}
+                        {entry.mentalSolution}
                       </p>
                     </div>
+                    <div>
+                      <h4 className="mb-1 font-headline text-lg font-semibold">
+                        Physical Activity
+                      </h4>
+                      <p className="leading-relaxed text-muted-foreground">
+                        {entry.physicalActivity}
+                      </p>
+                    </div>
+                    {entry.emergencyMessage && (
+                       <div>
+                        <h4 className="mb-1 font-headline text-lg font-semibold text-destructive">
+                          Important Message
+                        </h4>
+                        <p className="leading-relaxed text-muted-foreground">
+                          {entry.emergencyMessage}
+                        </p>
+                      </div>
+                    )}
                   </AccordionContent>
                 </AccordionItem>
               );

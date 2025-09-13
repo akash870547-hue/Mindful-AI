@@ -49,7 +49,9 @@ export default function JournalPage() {
       const saveResult = await saveJournalEntry({
         journalEntry: data.journalEntry,
         mood: result.data.mood,
-        copingTip: result.data.copingTip,
+        mentalSolution: result.data.mentalSolution,
+        physicalActivity: result.data.physicalActivity,
+        emergencyMessage: result.data.emergencyMessage,
       });
 
       if (saveResult.success) {

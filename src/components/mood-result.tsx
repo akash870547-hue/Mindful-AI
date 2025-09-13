@@ -12,9 +12,10 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Mood, MoodIcons } from '@/components/icons';
 import { AnalyzeMoodOutput } from '@/ai/flows/analyze-mood-and-suggest-coping-tip';
-import { Lightbulb, Volume2, Loader2, StopCircle } from 'lucide-react';
+import { Lightbulb, Volume2, Loader2, StopCircle, HeartPulse, Brain, TriangleAlert } from 'lucide-react';
 import { getSpeech } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface MoodResultProps {
   result: AnalyzeMoodOutput | null;
@@ -49,7 +50,10 @@ export function MoodResult({ result, isLoading }: MoodResultProps) {
     }
 
     setIsGeneratingSpeech(true);
-    const textToRead = `Your mood has been analyzed as ${result.mood}. Here is a coping tip for you: ${result.copingTip}`;
+    let textToRead = `Your mood has been analyzed as ${result.mood}. Here is a mental solution for you: ${result.mentalSolution}. And a physical activity you could try: ${result.physicalActivity}.`;
+    if (result.mood === 'Severe' && result.emergencyMessage) {
+      textToRead += ` Also, please listen to this important message: ${result.emergencyMessage}`;
+    }
     const speechResult = await getSpeech(textToRead);
     setIsGeneratingSpeech(false);
 
@@ -144,14 +148,34 @@ export function MoodResult({ result, isLoading }: MoodResultProps) {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <h3 className="mb-2 flex items-center gap-2 font-headline text-xl font-semibold">
-                <Lightbulb className="h-6 w-6 text-primary" />
-                Coping Tip
-              </h3>
-              <p className="leading-relaxed text-card-foreground/90">
-                {result.copingTip}
-              </p>
+            {result.mood === 'Severe' && result.emergencyMessage && (
+              <Alert variant="destructive">
+                <TriangleAlert className="h-4 w-4" />
+                <AlertTitle>Important Message</AlertTitle>
+                <AlertDescription>
+                  {result.emergencyMessage}
+                </AlertDescription>
+              </Alert>
+            )}
+            <div className='grid gap-4 md:grid-cols-2'>
+              <div className="space-y-2">
+                <h3 className="flex items-center gap-2 font-headline text-xl font-semibold">
+                  <Brain className="h-6 w-6 text-primary" />
+                  Mental Solution
+                </h3>
+                <p className="leading-relaxed text-card-foreground/90">
+                  {result.mentalSolution}
+                </p>
+              </div>
+              <div className="space-y-2">
+                <h3 className="mb-2 flex items-center gap-2 font-headline text-xl font-semibold">
+                  <HeartPulse className="h-6 w-6 text-primary" />
+                  Physical Activity
+                </h3>
+                <p className="leading-relaxed text-card-foreground/90">
+                  {result.physicalActivity}
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
