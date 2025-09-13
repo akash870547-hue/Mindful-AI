@@ -93,7 +93,7 @@ export function JournalForm({ onSubmit, isSubmitting }: JournalFormProps) {
         setIsRecording(false);
         return;
       }
-
+      
       console.error('Speech recognition error', event.error);
       if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
         toast({

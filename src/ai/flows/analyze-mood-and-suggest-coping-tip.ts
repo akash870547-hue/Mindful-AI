@@ -16,7 +16,7 @@ const AnalyzeMoodInputSchema = z.object({
 });
 export type AnalyzeMoodInput = z.infer<typeof AnalyzeMoodInputSchema>;
 
-const AnalyzeMoodOutputSchema = z.object({
+export const AnalyzeMoodOutputSchema = z.object({
   mood: z
     .enum(['Mild', 'Moderate', 'Severe'])
     .describe('The detected mood of the user (Mild, Moderate, or Severe).'),

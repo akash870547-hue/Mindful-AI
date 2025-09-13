@@ -6,6 +6,9 @@ import {
   AnalyzeMoodOutput,
 } from '@/ai/flows/analyze-mood-and-suggest-coping-tip';
 import {
+  analyzeFaceExpression,
+} from '@/ai/flows/analyze-face-expression';
+import {
   textToSpeech,
   TextToSpeechOutput,
 } from '@/ai/flows/text-to-speech';
@@ -32,6 +35,29 @@ export async function analyzeEntry(
       data: null,
       error:
         "Sorry, I couldn't analyze your entry right now. Please try again later.",
+    };
+  }
+}
+
+export async function analyzeFaceExpressionAction(
+  photoDataUri: string
+): Promise<{ data: AnalyzeMoodOutput | null; error: string | null }> {
+  if (!photoDataUri) {
+    return {
+      data: null,
+      error: 'No photo provided for analysis.',
+    };
+  }
+
+  try {
+    const result = await analyzeFaceExpression({ photoDataUri });
+    return { data: result, error: null };
+  } catch (e) {
+    console.error(e);
+    return {
+      data: null,
+      error:
+        "Sorry, I couldn't analyze your expression right now. Please try again later.",
     };
   }
 }

@@ -12,6 +12,7 @@ import type { AnalyzeMoodOutput } from '@/ai/flows/analyze-mood-and-suggest-copi
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { HomeIcon, LineChart } from 'lucide-react';
+import { FacialAnalysis } from '@/components/facial-analysis';
 
 export default function JournalPage() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
@@ -29,12 +30,11 @@ export default function JournalPage() {
     loadEntries();
   }, []);
 
-  async function handleJournalSubmit(data: { journalEntry: string }) {
+  async function handleSubmit(analysisPromise: Promise<{ data: AnalyzeMoodOutput | null; error: string | null }>, journalEntry?: string) {
     setIsSubmitting(true);
     setCurrentResult(null);
 
-    // 1. Get the analysis first and show it to the user.
-    const result = await analyzeEntry(data.journalEntry);
+    const result = await analysisPromise;
     setIsSubmitting(false);
 
     if (result.error) {
@@ -49,17 +49,14 @@ export default function JournalPage() {
     if (result.data) {
       setCurrentResult(result.data);
       
-      // 2. Save the entry to the database in the background.
-      // We don't await this, so the UI is not blocked.
       saveJournalEntry({
-        journalEntry: data.journalEntry,
+        journalEntry: journalEntry || `Facial analysis on ${new Date().toLocaleString()}`,
         mood: result.data.mood,
         mentalSolution: result.data.mentalSolution,
         physicalActivity: result.data.physicalActivity,
         emergencyMessage: result.data.emergencyMessage,
       }).then(saveResult => {
         if (saveResult.success) {
-          // 3. Refresh entries silently in the background
           getJournalEntries().then(fetchedEntries => {
             setEntries(fetchedEntries);
           });
@@ -102,9 +99,10 @@ export default function JournalPage() {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-5">
           <div className="space-y-8 lg:col-span-3">
             <JournalForm
-              onSubmit={handleJournalSubmit}
+              onSubmit={(data) => handleSubmit(analyzeEntry(data.journalEntry), data.journalEntry)}
               isSubmitting={isSubmitting}
             />
+            <FacialAnalysis onSubmit={handleSubmit} isSubmitting={isSubmitting} />
             <MoodResult result={currentResult} isLoading={isSubmitting} />
           </div>
           <div className="lg:col-span-2">
