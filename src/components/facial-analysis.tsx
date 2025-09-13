@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import type { AnalyzeMoodOutput } from '@/ai/flows/analyze-mood-and-suggest-coping-tip';
 import { Alert, AlertTitle, AlertDescription } from './ui/alert';
-import { analyzeFaceExpression } from '@/app/actions';
+import { analyzeFaceExpressionAction } from '@/app/actions';
 
 interface FacialAnalysisProps {
   onSubmit: (analysisPromise: Promise<{ data: AnalyzeMoodOutput | null; error: string | null }>) => void;
@@ -74,7 +74,7 @@ export function FacialAnalysis({ onSubmit, isSubmitting }: FacialAnalysisProps) 
     if (context) {
       context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
       const imageDataUri = canvas.toDataURL('image/jpeg');
-      onSubmit(analyzeFaceExpression(imageDataUri));
+      onSubmit(analyzeFaceExpressionAction(imageDataUri));
     }
   };
 
