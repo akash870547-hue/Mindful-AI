@@ -68,11 +68,11 @@ export default function Home() {
               </div>
               <div className="relative h-80 w-full overflow-hidden rounded-2xl shadow-2xl lg:h-[28rem]">
                 <Image
-                  src="https://picsum.photos/seed/1/600/400"
-                  alt="A person writing in a journal in a calm setting"
+                  src="https://picsum.photos/seed/10/600/400"
+                  alt="A serene image representing mental clarity and peace"
                   fill
                   className="object-cover"
-                  data-ai-hint="calm journal"
+                  data-ai-hint="serene mind"
                 />
                  <div className="absolute inset-0 bg-gradient-to-tr from-background/10 via-transparent to-background/10" />
               </div>
