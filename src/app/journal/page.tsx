@@ -11,7 +11,7 @@ import { JournalEntry } from '@/lib/types';
 import type { AnalyzeMoodOutput } from '@/ai/flows/analyze-mood-and-suggest-coping-tip';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { HomeIcon } from 'lucide-react';
+import { HomeIcon, LineChart } from 'lucide-react';
 
 export default function JournalPage() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
@@ -54,12 +54,20 @@ export default function JournalPage() {
             <BookText className="h-7 w-7 text-primary" />
             <h1 className="font-headline text-2xl font-bold">Mindful AI</h1>
           </div>
-          <Button variant="ghost" asChild>
-            <Link href="/">
-              <HomeIcon className="h-5 w-5" />
-              <span className="sr-only">Home</span>
-            </Link>
-          </Button>
+          <nav className="flex items-center gap-2">
+            <Button variant="ghost" asChild>
+              <Link href="/">
+                <HomeIcon className="h-5 w-5" />
+                <span className="sr-only">Home</span>
+              </Link>
+            </Button>
+            <Button variant="ghost" asChild>
+                <Link href="/progress">
+                    <LineChart className="h-5 w-5" />
+                    <span className="sr-only">Progress</span>
+                </Link>
+            </Button>
+          </nav>
         </div>
       </header>
       <main className="container mx-auto p-4 md:p-8">

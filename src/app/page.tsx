@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowRight, BookText, BrainCircuit, HeartPulse, Lightbulb } from 'lucide-react';
+import { ArrowRight, BookText, BrainCircuit, HeartPulse, Lightbulb, LineChart } from 'lucide-react';
 import Image from 'next/image';
 
 export default function Home() {
@@ -118,12 +118,12 @@ export default function Home() {
                 <div className="flex-1 p-6">
                   <div className="mb-4 flex items-center gap-3">
                     <div className="rounded-full bg-primary/10 p-2 text-primary">
-                      <HeartPulse className="h-6 w-6" />
+                      <LineChart className="h-6 w-6" />
                     </div>
                     <h4 className="font-headline text-xl font-semibold">Track Your Journey</h4>
                   </div>
                   <p className="text-muted-foreground">
-                    Look back on previous entries to see your emotional patterns and progress over time.
+                    Look back on previous entries and visualize your emotional patterns and progress over time.
                   </p>
                 </div>
               </div>
