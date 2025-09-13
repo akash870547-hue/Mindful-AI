@@ -56,6 +56,11 @@ export function JournalForm({ onSubmit, isSubmitting }: JournalFormProps) {
 
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<any>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -110,7 +115,8 @@ export function JournalForm({ onSubmit, isSubmitting }: JournalFormProps) {
 
 
   const toggleRecording = () => {
-    if (!recognitionRef.current) {
+    const isSpeechRecognitionSupported = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
+    if (!recognitionRef.current || !isSpeechRecognitionSupported) {
         toast({
             variant: 'destructive',
             title: 'Not Supported',
@@ -139,10 +145,7 @@ export function JournalForm({ onSubmit, isSubmitting }: JournalFormProps) {
     form.reset();
   };
 
-  const isSpeechRecognitionSupported =
-    typeof window !== 'undefined' &&
-    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
-
+  const isSpeechRecognitionSupported = isClient && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
   return (
     <Card className="shadow-lg">
