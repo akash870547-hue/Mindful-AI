@@ -63,18 +63,19 @@ export default function JournalPage() {
       };
       setEntries(prevEntries => [optimisticEntry, ...prevEntries]);
 
-      saveJournalEntry(newEntryData).then(saveResult => {
-        if (!saveResult.success) {
-           toast({
-              variant: 'destructive',
-              title: 'Database Error',
-              description: saveResult.error,
+      const saveResult = await saveJournalEntry(newEntryData);
+
+      if (!saveResult.success) {
+          toast({
+            variant: 'destructive',
+            title: 'Database Error',
+            description: saveResult.error,
           });
           setEntries(prevEntries => prevEntries.filter(e => e.id !== optimisticEntry.id));
-        } else {
-            getJournalEntries().then(setEntries);
-        }
-      });
+      } else {
+          // Re-fetch to get the final data from the server
+          getJournalEntries().then(setEntries);
+      }
     }
   }
 
