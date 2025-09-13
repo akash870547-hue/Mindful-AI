@@ -13,7 +13,7 @@ import {
 } from '@/ai/flows/text-to-speech';
 import { db } from '@/lib/firebase/firebase';
 import { JournalEntry, JournalEntryFromDb, AnalyzeMoodOutput } from '@/lib/types';
-import { collection, addDoc, getDocs, serverTimestamp, orderBy, query } from 'firebase/firestore';
+import { collection, addDoc, getDocs, serverTimestamp, orderBy, query, Timestamp } from 'firebase/firestore';
 
 export async function analyzeEntry(
   journalEntry: string
@@ -63,10 +63,11 @@ export async function analyzeFaceExpressionAction(
 
 export async function saveJournalEntry(
   entry: Omit<JournalEntry, 'id' | 'createdAt'>
-): Promise<{ success: boolean; error: string | null }> {
+): Promise<{ success: boolean; error: string | null; id?: string; createdAt?: string }> {
     try {
-        await addJournalEntry(entry);
-        return { success: true, error: null };
+        const docRef = await addJournalEntry(entry);
+        // We return a string for createdAt because Date objects are not serializable from Server Actions.
+        return { success: true, error: null, id: docRef.id, createdAt: new Date().toISOString() };
     } catch (e) {
         const error = e instanceof Error ? e.message : 'An unknown error occurred.';
         console.error('Error saving entry:', error);
@@ -97,10 +98,11 @@ export async function getSpeech(
 
 export async function addJournalEntry(entry: Omit<JournalEntry, 'id' | 'createdAt'>) {
     try {
-        await addDoc(collection(db, 'journalEntries'), {
+        const docRef = await addDoc(collection(db, 'journalEntries'), {
             ...entry,
             createdAt: serverTimestamp(),
         });
+        return docRef;
     } catch (error) {
         console.error('Error adding document: ', error);
         throw new Error('Could not save journal entry.');

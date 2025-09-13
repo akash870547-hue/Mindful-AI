@@ -58,6 +58,7 @@ export default function JournalPage() {
         emergencyMessage: result.data.emergencyMessage,
       };
 
+      // Optimistic update
       const optimisticEntry: JournalEntry = {
         ...newEntryData,
         id: `optimistic-${Date.now()}`,
@@ -65,18 +66,24 @@ export default function JournalPage() {
       };
       setEntries(prevEntries => [optimisticEntry, ...prevEntries]);
 
+      // Save to DB in the background
       const saveResult = await saveJournalEntry(newEntryData);
 
-      if (!saveResult.success) {
-          toast({
-            variant: 'destructive',
-            title: 'Database Error',
-            description: saveResult.error,
-          });
-          setEntries(prevEntries => prevEntries.filter(e => e.id !== optimisticEntry.id));
+      if (saveResult.success && saveResult.id) {
+        // Update the optimistic entry with the real ID and timestamp from the server
+        setEntries(prevEntries => 
+            prevEntries.map(entry => 
+                entry.id === optimisticEntry.id ? { ...entry, id: saveResult.id!, createdAt: new Date(saveResult.createdAt!) } : entry
+            )
+        );
       } else {
-          // Re-fetch to get the final data from the server
-          getJournalEntries().then(setEntries);
+        // Rollback on failure
+        toast({
+          variant: 'destructive',
+          title: 'Database Error',
+          description: saveResult.error,
+        });
+        setEntries(prevEntries => prevEntries.filter(e => e.id !== optimisticEntry.id));
       }
     }
   }
