@@ -38,7 +38,7 @@ const prompt = ai.definePrompt({
 
 Journal Entry: {{{journalEntry}}}
 
-Respond in a direct JSON format.`, // Ensure JSON format
+Respond in a direct JSON format.`,
   config: {
     safetySettings: [
       {
