@@ -113,9 +113,12 @@ export async function getJournalEntries(): Promise<JournalEntry[]> {
         const querySnapshot = await getDocs(q);
         return querySnapshot.docs.map(doc => {
             const data = doc.data() as JournalEntryFromDb;
+            // Ensure moodScore is handled correctly, providing a default if it's missing
+            const moodScore = data.moodScore ?? 0; 
             return {
                 id: doc.id,
                 ...data,
+                moodScore,
                 createdAt: data.createdAt.toDate(),
             };
         });

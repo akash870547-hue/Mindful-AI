@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef } from 'react';
@@ -17,16 +18,17 @@ import { getSpeech } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
+import { Progress } from '@/components/ui/progress';
 
 interface MoodResultProps {
   result: AnalyzeMoodOutput | null;
   isLoading: boolean;
 }
 
-const moodStyling: Record<Mood, { text: string, bg: string, border: string }> = {
-  Mild: { text: 'text-green-700', bg: 'bg-green-50', border: 'border-green-200' },
-  Moderate: { text: 'text-yellow-700', bg: 'bg-yellow-50', border: 'border-yellow-200' },
-  Severe: { text: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200' },
+const moodStyling: Record<Mood, { text: string, bg: string, border: string, progress: string }> = {
+  Mild: { text: 'text-green-700', bg: 'bg-green-50', border: 'border-green-200', progress: 'bg-green-500' },
+  Moderate: { text: 'text-yellow-700', bg: 'bg-yellow-50', border: 'border-yellow-200', progress: 'bg-yellow-500' },
+  Severe: { text: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200', progress: 'bg-red-500' },
 };
 
 
@@ -158,6 +160,15 @@ export function MoodResult({ result, isLoading }: MoodResultProps) {
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
+           {result.moodScore !== undefined && (
+            <div className="space-y-2">
+              <div className="flex justify-between font-headline text-lg">
+                <span className={cn('font-semibold', styles.text)}>Mood Intensity</span>
+                <span className={cn('font-bold', styles.text)}>{result.moodScore}%</span>
+              </div>
+              <Progress value={result.moodScore} className={cn("h-3", styles.progress)} />
+            </div>
+           )}
           {result.mood === 'Severe' && result.emergencyMessage && (
             <Alert variant="destructive">
               <TriangleAlert className="h-4 w-4" />

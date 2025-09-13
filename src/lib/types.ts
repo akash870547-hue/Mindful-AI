@@ -6,6 +6,11 @@ export const AnalyzeMoodOutputSchema = z.object({
   mood: z
     .enum(['Mild', 'Moderate', 'Severe'])
     .describe('The detected mood of the user (Mild, Moderate, or Severe).'),
+  moodScore: z
+    .number()
+    .min(0)
+    .max(100)
+    .describe('A score from 0 to 100 representing the intensity of the mood.'),
   mentalSolution: z
     .string()
     .describe('A short, relevant mental solution or coping tip for the user.'),

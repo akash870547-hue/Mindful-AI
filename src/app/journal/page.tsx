@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -51,6 +52,7 @@ export default function JournalPage() {
       const newEntryData = {
         journalEntry: journalEntryText || `Facial analysis on ${new Date().toLocaleString()}`,
         mood: result.data.mood,
+        moodScore: result.data.moodScore,
         mentalSolution: result.data.mentalSolution,
         physicalActivity: result.data.physicalActivity,
         emergencyMessage: result.data.emergencyMessage,
