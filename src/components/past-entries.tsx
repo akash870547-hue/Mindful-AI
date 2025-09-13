@@ -14,20 +14,21 @@ import {
 import { JournalEntry } from '@/lib/types';
 import { Mood, MoodIcons } from '@/components/icons';
 import { format } from 'date-fns';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface PastEntriesListProps {
   entries: JournalEntry[];
 }
 
 const moodTextClass: Record<Mood, string> = {
-  Mild: 'text-chart-2',
-  Moderate: 'text-chart-4',
-  Severe: 'text-chart-1',
+  Mild: 'text-green-600',
+  Moderate: 'text-yellow-600',
+  Severe: 'text-red-600',
 };
 
 export function PastEntriesList({ entries }: PastEntriesListProps) {
   return (
-    <Card className="h-full shadow-lg">
+    <Card className="h-full shadow-lg backdrop-blur-sm bg-card/80 sticky top-24">
       <CardHeader>
         <CardTitle className="font-headline text-3xl">Previous Entries</CardTitle>
         <CardDescription>
@@ -38,65 +39,67 @@ export function PastEntriesList({ entries }: PastEntriesListProps) {
       </CardHeader>
       <CardContent>
         {entries.length > 0 ? (
-          <Accordion type="single" collapsible className="w-full">
-            {entries.map(entry => {
-              const mood = entry.mood as Mood;
-              const Icon = MoodIcons[mood];
-              return (
-                <AccordionItem value={entry.id} key={entry.id}>
-                  <AccordionTrigger>
-                    <div className="flex items-center gap-4">
-                      <Icon className={`h-6 w-6 shrink-0 ${moodTextClass[mood]}`} />
-                      <div className="text-left">
-                        <p className="font-semibold">
-                          {format(entry.createdAt, 'MMMM d, yyyy')}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Mood: {mood}
-                        </p>
+          <ScrollArea className="h-[60vh] pr-4">
+            <Accordion type="single" collapsible className="w-full">
+              {entries.map(entry => {
+                const mood = entry.mood as Mood;
+                const Icon = MoodIcons[mood];
+                return (
+                  <AccordionItem value={entry.id} key={entry.id} className="border-b-border/70">
+                    <AccordionTrigger className="hover:no-underline">
+                      <div className="flex items-center gap-4 w-full">
+                        <Icon className={`h-6 w-6 shrink-0 ${moodTextClass[mood]}`} />
+                        <div className="text-left flex-1">
+                          <p className="font-semibold">
+                            {format(entry.createdAt, 'MMMM d, yyyy')}
+                          </p>
+                          <p className={`text-sm font-medium ${moodTextClass[mood]}`}>
+                            Mood: {mood}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="space-y-4 pt-2">
-                    <div>
-                      <h4 className="mb-1 font-headline text-lg font-semibold">
-                        Your Entry
-                      </h4>
-                      <p className="leading-relaxed text-muted-foreground">
-                        {entry.journalEntry}
-                      </p>
-                    </div>
-                     <div>
-                      <h4 className="mb-1 font-headline text-lg font-semibold">
-                        Mental Solution
-                      </h4>
-                      <p className="leading-relaxed text-muted-foreground">
-                        {entry.mentalSolution}
-                      </p>
-                    </div>
-                    <div>
-                      <h4 className="mb-1 font-headline text-lg font-semibold">
-                        Physical Activity
-                      </h4>
-                      <p className="leading-relaxed text-muted-foreground">
-                        {entry.physicalActivity}
-                      </p>
-                    </div>
-                    {entry.emergencyMessage && (
-                       <div>
-                        <h4 className="mb-1 font-headline text-lg font-semibold text-destructive">
-                          Important Message
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-4 pt-2 text-base">
+                      <div className="prose prose-sm max-w-none text-muted-foreground">
+                        <h4 className="mb-1 font-headline text-lg font-semibold text-foreground">
+                          Your Entry
                         </h4>
-                        <p className="leading-relaxed text-muted-foreground">
-                          {entry.emergencyMessage}
+                        <p className="leading-relaxed">
+                          {entry.journalEntry}
                         </p>
                       </div>
-                    )}
-                  </AccordionContent>
-                </AccordionItem>
-              );
-            })}
-          </Accordion>
+                       <div className="prose prose-sm max-w-none text-muted-foreground">
+                        <h4 className="mb-1 font-headline text-lg font-semibold text-foreground">
+                          Mental Solution
+                        </h4>
+                        <p className="leading-relaxed">
+                          {entry.mentalSolution}
+                        </p>
+                      </div>
+                      <div className="prose prose-sm max-w-none text-muted-foreground">
+                        <h4 className="mb-1 font-headline text-lg font-semibold text-foreground">
+                          Physical Activity
+                        </h4>
+                        <p className="leading-relaxed">
+                          {entry.physicalActivity}
+                        </p>
+                      </div>
+                      {entry.emergencyMessage && (
+                         <div className="prose prose-sm max-w-none text-destructive/80">
+                          <h4 className="mb-1 font-headline text-lg font-semibold text-destructive">
+                            Important Message
+                          </h4>
+                          <p className="leading-relaxed">
+                            {entry.emergencyMessage}
+                          </p>
+                        </div>
+                      )}
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              })}
+            </Accordion>
+          </ScrollArea>
         ) : (
           <div className="flex h-48 items-center justify-center rounded-lg border-2 border-dashed">
             <p className="text-muted-foreground">No entries yet.</p>

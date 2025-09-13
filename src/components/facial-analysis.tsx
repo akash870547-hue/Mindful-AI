@@ -100,15 +100,15 @@ export function FacialAnalysis({ onSubmit, isSubmitting }: FacialAnalysisProps) 
   };
 
   return (
-    <Card className="shadow-lg">
+    <Card className="shadow-lg backdrop-blur-sm bg-card/80">
       <CardHeader>
-        <CardTitle className="font-headline text-3xl">Facial Analysis</CardTitle>
-        <CardDescription>Let the AI analyze your facial expression for a quick mood check.</CardDescription>
+        <CardTitle className="font-headline text-3xl">Quick Mood Scan</CardTitle>
+        <CardDescription>Optionally, use your camera for an instant mood analysis based on your facial expression.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {isCameraOpen ? (
           <>
-            <div className="relative aspect-video w-full overflow-hidden rounded-md border bg-muted">
+            <div className="relative aspect-video w-full overflow-hidden rounded-lg border bg-muted shadow-inner">
               <video ref={videoRef} className="h-full w-full object-cover" autoPlay muted playsInline />
               {!stream && (
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -117,27 +117,29 @@ export function FacialAnalysis({ onSubmit, isSubmitting }: FacialAnalysisProps) 
               )}
             </div>
             
-            <Button onClick={handleAnalyzeFace} disabled={isSubmitting || !stream} className="w-full text-lg py-6">
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Analyzing Face...
-                </>
-              ) : (
-                <>
-                  <Camera className="mr-2 h-5 w-5" />
-                  Analyze My Expression
-                </>
-              )}
-            </Button>
-            <Button onClick={stopCamera} variant="outline" className="w-full">
-              <X className="mr-2 h-5 w-5" />
-              Close Camera
-            </Button>
+            <div className="grid grid-cols-2 gap-4">
+              <Button onClick={handleAnalyzeFace} disabled={isSubmitting || !stream} className="w-full text-lg py-6">
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <Camera className="mr-2 h-5 w-5" />
+                    Scan Face
+                  </>
+                )}
+              </Button>
+              <Button onClick={stopCamera} variant="outline" className="w-full text-lg py-6">
+                <X className="mr-2 h-5 w-5" />
+                Close Camera
+              </Button>
+            </div>
           </>
         ) : (
           <>
-            <div className="flex aspect-video w-full flex-col items-center justify-center rounded-md border-2 border-dashed bg-muted/50">
+            <div className="flex aspect-video w-full flex-col items-center justify-center rounded-lg border-2 border-dashed bg-muted/30">
               <Video className="h-16 w-16 text-muted-foreground" />
               <p className="mt-2 text-muted-foreground">Camera is off</p>
             </div>

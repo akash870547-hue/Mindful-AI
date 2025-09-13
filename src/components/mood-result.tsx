@@ -12,21 +12,23 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Mood, MoodIcons } from '@/components/icons';
 import { AnalyzeMoodOutput } from '@/lib/types';
-import { Lightbulb, Volume2, Loader2, StopCircle, HeartPulse, Brain, TriangleAlert } from 'lucide-react';
+import { Volume2, Loader2, StopCircle, HeartPulse, Brain, TriangleAlert } from 'lucide-react';
 import { getSpeech } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { cn } from '@/lib/utils';
 
 interface MoodResultProps {
   result: AnalyzeMoodOutput | null;
   isLoading: boolean;
 }
 
-const moodTextClass: Record<Mood, string> = {
-  Mild: 'text-chart-2',
-  Moderate: 'text-chart-4',
-  Severe: 'text-chart-1',
+const moodStyling: Record<Mood, { text: string, bg: string, border: string }> = {
+  Mild: { text: 'text-green-700', bg: 'bg-green-50', border: 'border-green-200' },
+  Moderate: { text: 'text-yellow-700', bg: 'bg-yellow-50', border: 'border-yellow-200' },
+  Severe: { text: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200' },
 };
+
 
 export function MoodResult({ result, isLoading }: MoodResultProps) {
   const [isGeneratingSpeech, setIsGeneratingSpeech] = useState(false);
@@ -75,6 +77,45 @@ export function MoodResult({ result, isLoading }: MoodResultProps) {
   const mood = result?.mood as Mood;
   const Icon = result ? MoodIcons[mood] : null;
 
+  if (isLoading) {
+    return (
+      <Card className="shadow-lg">
+        <CardHeader>
+          <div className="flex items-center gap-4">
+            <Skeleton className="h-12 w-12 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-7 w-48" />
+              <Skeleton className="h-5 w-64" />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+           <Skeleton className="h-24 w-full" />
+           <Skeleton className="h-24 w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!result || !Icon) {
+    return (
+      <Card className="flex min-h-[320px] flex-col items-center justify-center border-2 border-dashed bg-card/50 text-center shadow-none backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="font-headline text-muted-foreground">
+            Your Analysis Appears Here
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">
+            Submit a journal entry or a facial scan, and I'll help you understand your mood.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  const styles = moodStyling[mood];
+
   return (
     <>
       <audio
@@ -82,104 +123,72 @@ export function MoodResult({ result, isLoading }: MoodResultProps) {
         onEnded={() => setIsPlaying(false)}
         className="hidden"
       />
-      {isLoading ? (
-        <Card className="shadow-lg">
-          <CardHeader>
+      <Card className={cn("shadow-xl transition-all duration-300 backdrop-blur-sm", styles.bg, styles.border)}>
+        <CardHeader>
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Skeleton className="h-10 w-10 rounded-full" />
-              <div className="space-y-2">
-                <Skeleton className="h-7 w-48" />
-                <Skeleton className="h-5 w-64" />
+              <div className={cn("p-2 rounded-full", styles.bg)}>
+                <Icon className={cn("h-10 w-10 shrink-0", styles.text)} />
+              </div>
+              <div>
+                <CardTitle className="font-headline text-3xl">
+                  Analysis: <span className={styles.text}>{mood}</span>
+                </CardTitle>
+                <CardDescription className={cn(styles.text, "opacity-80")}>
+                  Here's what I gathered from your input.
+                </CardDescription>
               </div>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={handlePlayAudio}
+              disabled={isGeneratingSpeech}
+              className={cn("h-12 w-12 shrink-0 rounded-full hover:bg-black/5", styles.text)}
+            >
+              {isGeneratingSpeech ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : isPlaying ? (
+                <StopCircle className="h-7 w-7" />
+              ) : (
+                <Volume2 className="h-7 w-7" />
+              )}
+              <span className="sr-only">Read analysis aloud</span>
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {result.mood === 'Severe' && result.emergencyMessage && (
+            <Alert variant="destructive">
+              <TriangleAlert className="h-4 w-4" />
+              <AlertTitle>Important Message</AlertTitle>
+              <AlertDescription>
+                {result.emergencyMessage}
+              </AlertDescription>
+            </Alert>
+          )}
+          <div className='grid gap-6'>
             <div className="space-y-2">
-              <Skeleton className="h-6 w-32" />
-              <Skeleton className="h-5 w-full" />
-              <Skeleton className="h-5 w-5/6" />
+              <h3 className="flex items-center gap-3 font-headline text-xl font-semibold">
+                <Brain className="h-7 w-7 text-primary" />
+                Mental Solution
+              </h3>
+              <p className="leading-relaxed text-card-foreground/90 pl-10">
+                {result.mentalSolution}
+              </p>
             </div>
-          </CardContent>
-        </Card>
-      ) : !result || !Icon ? (
-        <Card className="flex min-h-[260px] flex-col items-center justify-center border-2 border-dashed bg-transparent text-center shadow-none">
-          <CardHeader>
-            <CardTitle className="font-headline text-muted-foreground">
-              Your Analysis Appears Here
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              Submit a journal entry and I'll help you understand your mood.
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card className="bg-accent/50 shadow-lg">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <Icon className={`h-10 w-10 shrink-0 ${moodTextClass[mood]}`} />
-                <div>
-                  <CardTitle className="font-headline text-3xl">
-                    Analysis: <span className={moodTextClass[mood]}>{mood}</span>
-                  </CardTitle>
-                  <CardDescription>
-                    Here's what I gathered from your entry.
-                  </CardDescription>
-                </div>
-              </div>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={handlePlayAudio}
-                disabled={isGeneratingSpeech}
-                className="h-12 w-12 shrink-0 rounded-full"
-              >
-                {isGeneratingSpeech ? (
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                ) : isPlaying ? (
-                  <StopCircle className="h-7 w-7" />
-                ) : (
-                  <Volume2 className="h-7 w-7" />
-                )}
-                <span className="sr-only">Read analysis aloud</span>
-              </Button>
+            <div className="space-y-2">
+              <h3 className="flex items-center gap-3 font-headline text-xl font-semibold">
+                <HeartPulse className="h-7 w-7 text-primary" />
+                Physical Activity
+              </h3>
+              <p className="leading-relaxed text-card-foreground/90 pl-10">
+                {result.physicalActivity}
+              </p>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {result.mood === 'Severe' && result.emergencyMessage && (
-              <Alert variant="destructive">
-                <TriangleAlert className="h-4 w-4" />
-                <AlertTitle>Important Message</AlertTitle>
-                <AlertDescription>
-                  {result.emergencyMessage}
-                </AlertDescription>
-              </Alert>
-            )}
-            <div className='grid gap-4 md:grid-cols-2'>
-              <div className="space-y-2">
-                <h3 className="flex items-center gap-2 font-headline text-xl font-semibold">
-                  <Brain className="h-6 w-6 text-primary" />
-                  Mental Solution
-                </h3>
-                <p className="leading-relaxed text-card-foreground/90">
-                  {result.mentalSolution}
-                </p>
-              </div>
-              <div className="space-y-2">
-                <h3 className="mb-2 flex items-center gap-2 font-headline text-xl font-semibold">
-                  <HeartPulse className="h-6 w-6 text-primary" />
-                  Physical Activity
-                </h3>
-                <p className="leading-relaxed text-card-foreground/90">
-                  {result.physicalActivity}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        </CardContent>
+      </Card>
     </>
   );
 }

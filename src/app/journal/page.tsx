@@ -56,7 +56,6 @@ export default function JournalPage() {
         emergencyMessage: result.data.emergencyMessage,
       };
 
-      // Optimistic UI update
       const optimisticEntry: JournalEntry = {
         ...newEntryData,
         id: `optimistic-${Date.now()}`,
@@ -71,13 +70,9 @@ export default function JournalPage() {
               title: 'Database Error',
               description: saveResult.error,
           });
-          // Revert optimistic update on failure
           setEntries(prevEntries => prevEntries.filter(e => e.id !== optimisticEntry.id));
         } else {
-            // Optionally, you could re-fetch to get the real ID and timestamp,
-            // but for a faster UI, we can just continue with the optimistic one.
-            // For this app, the optimistic data is sufficient.
-            getJournalEntries().then(setEntries); // Refresh list with real data from DB
+            getJournalEntries().then(setEntries);
         }
       });
     }
@@ -85,11 +80,11 @@ export default function JournalPage() {
 
   return (
     <div className="min-h-screen bg-background font-body text-foreground">
-      <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur-sm">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
+       <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-lg">
+        <div className="container mx-auto flex h-20 items-center justify-between px-4">
           <div className="flex items-center gap-3">
-            <BookText className="h-7 w-7 text-primary" />
-            <h1 className="font-headline text-2xl font-bold">Mental Health AI Companion</h1>
+            <BookText className="h-8 w-8 text-primary" />
+            <h1 className="font-headline text-3xl font-bold">Mental Health AI Companion</h1>
           </div>
           <nav className="flex items-center gap-2">
             <Button variant="ghost" asChild>
@@ -117,9 +112,9 @@ export default function JournalPage() {
             <FacialAnalysis onSubmit={handleSubmit} isSubmitting={isSubmitting} />
             <MoodResult result={currentResult} isLoading={isSubmitting} />
           </div>
-          <div className="lg:col-span-2">
+          <aside className="lg:col-span-2">
             <PastEntriesList entries={entries} />
-          </div>
+          </aside>
         </div>
       </main>
       <footer className="py-8 text-center text-sm text-muted-foreground">

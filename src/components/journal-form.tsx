@@ -21,7 +21,7 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card';
-import { Loader2, Mic, MicOff } from 'lucide-react';
+import { Loader2, Mic, MicOff, BookHeart } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
@@ -37,7 +37,6 @@ interface JournalFormProps {
   isSubmitting: boolean;
 }
 
-// Add this type definition for SpeechRecognition
 declare global {
   interface Window {
     SpeechRecognition: any;
@@ -66,7 +65,6 @@ export function JournalForm({ onSubmit, isSubmitting }: JournalFormProps) {
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!isClient || !SpeechRecognition) {
-      // Silently fail if not supported, the button just won't be shown
       return;
     }
 
@@ -88,7 +86,6 @@ export function JournalForm({ onSubmit, isSubmitting }: JournalFormProps) {
     };
 
     recognition.onerror = (event: any) => {
-      // Ignore the 'no-speech' error, which is common if the user doesn't speak.
       if (event.error === 'no-speech') {
         setIsRecording(false);
         return;
@@ -133,7 +130,6 @@ export function JournalForm({ onSubmit, isSubmitting }: JournalFormProps) {
       recognitionRef.current.stop();
       setIsRecording(false);
     } else {
-      // Clear previous entry before starting a new recording
       finalTranscriptRef.current = '';
       form.reset({ journalEntry: '' });
       recognitionRef.current.start();
@@ -155,13 +151,14 @@ export function JournalForm({ onSubmit, isSubmitting }: JournalFormProps) {
   const isSpeechRecognitionSupported = isClient && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
   return (
-    <Card className="shadow-lg">
+    <Card className="shadow-lg backdrop-blur-sm bg-card/80">
       <CardHeader>
-        <CardTitle className="font-headline text-3xl">
+        <CardTitle className="font-headline text-3xl flex items-center gap-3">
+          <BookHeart className="h-8 w-8 text-primary" />
           How are you feeling today?
         </CardTitle>
         <CardDescription>
-          Let it all out. Your thoughts are safe here.
+          Let it all out. Your thoughts are safe here. Use your voice or keyboard.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -176,8 +173,8 @@ export function JournalForm({ onSubmit, isSubmitting }: JournalFormProps) {
                   <FormControl>
                     <div className="relative">
                       <Textarea
-                        placeholder="Write about your day, your thoughts, or anything that's on your mind... or click the mic to speak."
-                        className="min-h-[200px] resize-none text-base pr-12"
+                        placeholder="Write about your day, your thoughts, or anything that's on your mind..."
+                        className="min-h-[200px] resize-none text-base pr-14 py-4 pl-4"
                         {...field}
                       />
                        {isSpeechRecognitionSupported && (
@@ -185,7 +182,7 @@ export function JournalForm({ onSubmit, isSubmitting }: JournalFormProps) {
                             type="button"
                             size="icon"
                             variant={isRecording ? 'destructive' : 'ghost'}
-                            className="absolute bottom-3 right-3 rounded-full"
+                            className="absolute bottom-3 right-3 rounded-full w-10 h-10"
                             onClick={toggleRecording}
                         >
                             {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
@@ -198,7 +195,7 @@ export function JournalForm({ onSubmit, isSubmitting }: JournalFormProps) {
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={isSubmitting} className="w-full text-lg py-6">
+            <Button type="submit" disabled={isSubmitting} className="w-full text-lg py-7">
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />

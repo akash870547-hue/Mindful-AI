@@ -4,26 +4,26 @@
 
 @layer base {
   :root {
-    --background: 0 0% 96.1%; /* #F5F5F5 */
+    --background: 240 20% 97%; /* Lighter, softer off-white */
     --foreground: 240 10% 3.9%;
-    --card: 240 67% 97%; /* #E6E6FA */
+    --card: 240 60% 98%; /* Slightly transparent white for glass effect */
     --card-foreground: 240 10% 3.9%;
-    --popover: 240 67% 97%; /* #E6E6FA */
+    --popover: 240 60% 98%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 250 60% 55%; /* Accessible darker lavender */
+    --primary: 250 65% 60%; /* A slightly more vibrant lavender */
     --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 90%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 90%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 120 70% 92%; /* #D3FFD3 toned down */
-    --accent-foreground: 0 0% 9%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 50% 90%; /* Softer lavender accent */
+    --accent-foreground: 240 5.9% 10%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 100%;
-    --ring: 250 60% 55%;
-    --radius: 0.5rem;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 100%;
+    --ring: 250 65% 60%;
+    --radius: 0.75rem;
     --chart-1: 0 72% 51%; /* red for severe */
     --chart-2: 142 71% 45%; /* green for mild */
     --chart-3: 197 37% 24%;
@@ -52,7 +52,7 @@
     --secondary-foreground: 0 0% 98%;
     --muted: 0 0% 14.9%;
     --muted-foreground: 0 0% 63.9%;
-    --accent: 120 20% 15%;
+    --accent: 240 20% 15%;
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
