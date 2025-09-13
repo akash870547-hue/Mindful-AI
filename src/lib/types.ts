@@ -1,4 +1,4 @@
-'use server';
+
 import {z} from 'genkit';
 import {Timestamp} from 'firebase/firestore';
 
