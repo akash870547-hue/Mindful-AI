@@ -57,6 +57,7 @@ export function JournalForm({ onSubmit, isSubmitting }: JournalFormProps) {
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<any>(null);
   const [isClient, setIsClient] = useState(false);
+  const finalTranscriptRef = useRef('');
 
   useEffect(() => {
     setIsClient(true);
@@ -64,7 +65,7 @@ export function JournalForm({ onSubmit, isSubmitting }: JournalFormProps) {
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
+    if (!isClient || !SpeechRecognition) {
       // Silently fail if not supported, the button just won't be shown
       return;
     }
@@ -76,16 +77,14 @@ export function JournalForm({ onSubmit, isSubmitting }: JournalFormProps) {
 
     recognition.onresult = (event: any) => {
       let interimTranscript = '';
-      let finalTranscript = form.getValues('journalEntry') || '';
-
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript + ' ';
+          finalTranscriptRef.current += event.results[i][0].transcript + ' ';
         } else {
           interimTranscript += event.results[i][0].transcript;
         }
       }
-      form.setValue('journalEntry', finalTranscript + interimTranscript, { shouldValidate: true });
+      form.setValue('journalEntry', finalTranscriptRef.current + interimTranscript, { shouldValidate: true });
     };
 
     recognition.onerror = (event: any) => {
@@ -117,7 +116,7 @@ export function JournalForm({ onSubmit, isSubmitting }: JournalFormProps) {
         recognitionRef.current.stop();
       }
     };
-  }, [form, toast]);
+  }, [isClient, form, toast]);
 
 
   const toggleRecording = () => {
@@ -135,6 +134,7 @@ export function JournalForm({ onSubmit, isSubmitting }: JournalFormProps) {
       setIsRecording(false);
     } else {
       // Clear previous entry before starting a new recording
+      finalTranscriptRef.current = '';
       form.reset({ journalEntry: '' });
       recognitionRef.current.start();
       setIsRecording(true);
@@ -148,6 +148,7 @@ export function JournalForm({ onSubmit, isSubmitting }: JournalFormProps) {
         recognitionRef.current.stop();
         setIsRecording(false);
     }
+    finalTranscriptRef.current = '';
     form.reset();
   };
 
