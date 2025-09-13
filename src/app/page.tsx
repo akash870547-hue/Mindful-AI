@@ -72,7 +72,7 @@ export default function Home() {
                   alt="A serene image representing mental clarity and peace"
                   fill
                   className="object-cover"
-                  data-ai-hint="mental clarity"
+                  data-ai-hint="medical health"
                 />
                  <div className="absolute inset-0 bg-gradient-to-tr from-background/10 via-transparent to-background/10" />
               </div>
@@ -95,7 +95,7 @@ export default function Home() {
                   href="/journal"
                   imgSrc="https://picsum.photos/seed/2/400/300"
                   imgAlt="Abstract representation of mood analysis"
-                  imgHint="medical stress"
+                  imgHint="brain scan"
                   icon={BrainCircuit}
                   title="AI Mood Analysis">
                     Our advanced AI reads your journal entries to identify your mood, helping you gain clarity on your emotional state.
@@ -105,7 +105,7 @@ export default function Home() {
                   href="/journal"
                   imgSrc="https://picsum.photos/seed/3/400/300"
                   imgAlt="A lightbulb symbolizing a helpful tip"
-                  imgHint="stress relief"
+                  imgHint="medical consultation"
                   icon={Lightbulb}
                   title="Personalized Tips">
                   Receive gentle, actionable coping tips tailored to your mood to help you navigate your feelings.
@@ -115,7 +115,7 @@ export default function Home() {
                   href="/progress"
                   imgSrc="https://picsum.photos/seed/4/400/300"
                   imgAlt="A chart showing progress over time"
-                  imgHint="happy person"
+                  imgHint="health chart"
                   icon={LineChart}
                   title="Track Your Journey">
                   Look back on previous entries and visualize your emotional patterns and progress over time.
