@@ -25,13 +25,6 @@ export async function analyzeEntry(
 
   try {
     const result = await analyzeMoodAndSuggestCopingTip({ journalEntry });
-    // Also save to database
-    if (result) {
-      await addJournalEntry({
-        journalEntry,
-        ...result,
-      });
-    }
     return { data: result, error: null };
   } catch (e) {
     console.error(e);
@@ -42,6 +35,20 @@ export async function analyzeEntry(
     };
   }
 }
+
+export async function saveJournalEntry(
+  entry: Omit<JournalEntry, 'id' | 'createdAt'>
+): Promise<{ success: boolean; error: string | null }> {
+    try {
+        await addJournalEntry(entry);
+        return { success: true, error: null };
+    } catch (e) {
+        const error = e instanceof Error ? e.message : 'An unknown error occurred.';
+        console.error('Error saving entry:', error);
+        return { success: false, error: 'Could not save your journal entry.' };
+    }
+}
+
 
 export async function getSpeech(
   text: string

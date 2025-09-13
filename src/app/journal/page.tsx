@@ -5,7 +5,7 @@ import { BookText } from 'lucide-react';
 import { JournalForm } from '@/components/journal-form';
 import { MoodResult } from '@/components/mood-result';
 import { PastEntriesList } from '@/components/past-entries';
-import { analyzeEntry, getJournalEntries } from '@/app/actions';
+import { analyzeEntry, getJournalEntries, saveJournalEntry } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { JournalEntry } from '@/lib/types';
 import type { AnalyzeMoodOutput } from '@/ai/flows/analyze-mood-and-suggest-coping-tip';
@@ -34,6 +34,7 @@ export default function JournalPage() {
     setCurrentResult(null);
 
     const result = await analyzeEntry(data.journalEntry);
+    setIsSubmitting(false);
 
     if (result.error) {
       toast({
@@ -43,11 +44,26 @@ export default function JournalPage() {
       });
     } else if (result.data) {
       setCurrentResult(result.data);
-      // Refresh entries from the database
-      const fetchedEntries = await getJournalEntries();
-      setEntries(fetchedEntries);
+      
+      // Now save the entry to the database in the background
+      const saveResult = await saveJournalEntry({
+        journalEntry: data.journalEntry,
+        mood: result.data.mood,
+        copingTip: result.data.copingTip,
+      });
+
+      if (saveResult.success) {
+        // Refresh entries from the database
+        const fetchedEntries = await getJournalEntries();
+        setEntries(fetchedEntries);
+      } else {
+         toast({
+            variant: 'destructive',
+            title: 'Database Error',
+            description: saveResult.error,
+        });
+      }
     }
-    setIsSubmitting(false);
   }
 
   return (
