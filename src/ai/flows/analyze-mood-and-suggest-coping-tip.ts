@@ -10,32 +10,15 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import {
+  AnalyzeMoodOutput,
+  AnalyzeMoodOutputSchema,
+} from '@/lib/types';
 
 const AnalyzeMoodInputSchema = z.object({
   journalEntry: z.string().describe("The user's journal entry for the day."),
 });
 export type AnalyzeMoodInput = z.infer<typeof AnalyzeMoodInputSchema>;
-
-export const AnalyzeMoodOutputSchema = z.object({
-  mood: z
-    .enum(['Mild', 'Moderate', 'Severe'])
-    .describe('The detected mood of the user (Mild, Moderate, or Severe).'),
-  mentalSolution: z
-    .string()
-    .describe('A short, relevant mental solution or coping tip for the user.'),
-  physicalActivity: z
-    .string()
-    .describe(
-      'A simple physical activity suggestion (e.g., breathing exercise, walk, yoga).'
-    ),
-  emergencyMessage: z
-    .string()
-    .optional()
-    .describe(
-      'An empathetic emergency alert message, only to be provided if the mood is detected as "Severe".'
-    ),
-});
-export type AnalyzeMoodOutput = z.infer<typeof AnalyzeMoodOutputSchema>;
 
 export async function analyzeMoodAndSuggestCopingTip(
   input: AnalyzeMoodInput

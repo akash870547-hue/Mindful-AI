@@ -5,7 +5,7 @@ import { Camera, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import type { AnalyzeMoodOutput } from '@/ai/flows/analyze-mood-and-suggest-coping-tip';
+import { AnalyzeMoodOutput } from '@/lib/types';
 import { Alert, AlertTitle, AlertDescription } from './ui/alert';
 import { analyzeFaceExpressionAction } from '@/app/actions';
 

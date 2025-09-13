@@ -10,7 +10,10 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import { AnalyzeMoodOutput, AnalyzeMoodOutputSchema } from './analyze-mood-and-suggest-coping-tip';
+import {
+  AnalyzeMoodOutput,
+  AnalyzeMoodOutputSchema,
+} from '@/lib/types';
 
 const AnalyzeFaceExpressionInputSchema = z.object({
   photoDataUri: z

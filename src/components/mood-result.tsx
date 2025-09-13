@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Mood, MoodIcons } from '@/components/icons';
-import { AnalyzeMoodOutput } from '@/ai/flows/analyze-mood-and-suggest-coping-tip';
+import { AnalyzeMoodOutput } from '@/lib/types';
 import { Lightbulb, Volume2, Loader2, StopCircle, HeartPulse, Brain, TriangleAlert } from 'lucide-react';
 import { getSpeech } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';

@@ -2,8 +2,7 @@
 'use server';
 
 import {
-  analyzeMoodAndSuggestCopingTip,
-  AnalyzeMoodOutput,
+  analyzeMoodAndSuggestCopingTip
 } from '@/ai/flows/analyze-mood-and-suggest-coping-tip';
 import {
   analyzeFaceExpression,
@@ -13,7 +12,7 @@ import {
   TextToSpeechOutput,
 } from '@/ai/flows/text-to-speech';
 import { db } from '@/lib/firebase/firebase';
-import { JournalEntry, JournalEntryFromDb } from '@/lib/types';
+import { JournalEntry, JournalEntryFromDb, AnalyzeMoodOutput } from '@/lib/types';
 import { collection, addDoc, getDocs, serverTimestamp, orderBy, query } from 'firebase/firestore';
 
 export async function analyzeEntry(
