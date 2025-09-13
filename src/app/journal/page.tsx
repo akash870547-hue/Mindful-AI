@@ -33,6 +33,7 @@ export default function JournalPage() {
     setIsSubmitting(true);
     setCurrentResult(null);
 
+    // 1. Get the analysis first and show it to the user.
     const result = await analyzeEntry(data.journalEntry);
     setIsSubmitting(false);
 
@@ -42,29 +43,34 @@ export default function JournalPage() {
         title: 'Analysis Error',
         description: result.error,
       });
-    } else if (result.data) {
+      return;
+    } 
+    
+    if (result.data) {
       setCurrentResult(result.data);
       
-      // Now save the entry to the database in the background
-      const saveResult = await saveJournalEntry({
+      // 2. Save the entry to the database in the background.
+      // We don't await this, so the UI is not blocked.
+      saveJournalEntry({
         journalEntry: data.journalEntry,
         mood: result.data.mood,
         mentalSolution: result.data.mentalSolution,
         physicalActivity: result.data.physicalActivity,
         emergencyMessage: result.data.emergencyMessage,
+      }).then(saveResult => {
+        if (saveResult.success) {
+          // 3. Refresh entries silently in the background
+          getJournalEntries().then(fetchedEntries => {
+            setEntries(fetchedEntries);
+          });
+        } else {
+           toast({
+              variant: 'destructive',
+              title: 'Database Error',
+              description: saveResult.error,
+          });
+        }
       });
-
-      if (saveResult.success) {
-        // Refresh entries from the database
-        const fetchedEntries = await getJournalEntries();
-        setEntries(fetchedEntries);
-      } else {
-         toast({
-            variant: 'destructive',
-            title: 'Database Error',
-            description: saveResult.error,
-        });
-      }
     }
   }
 
