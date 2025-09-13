@@ -37,7 +37,7 @@ const prompt = ai.definePrompt({
 2.  **Mood Score**: Provide a numerical score from 0 to 100 indicating the intensity of the detected mood. A higher score means a more intense or severe mood.
 3.  **Mental Solution**: Provide a short, actionable mental solution (like a mindfulness exercise or a coping strategy).
 4.  **Physical Activity**: Provide a simple, accessible physical activity suggestion (e.g., a 5-minute walk, stretching).
-5.  **Emergency Message**: If AND ONLY IF the mood is "Severe", include a gentle and empathetic emergency alert message. For "Mild" or "Moderate" moods, this field must be omitted.
+5.  **Emergency Message**: If the mood is "Severe", include a gentle and empathetic emergency alert message. For "Mild" or "Moderate" moods, this field MUST be null.
 
 Journal Entry: {{{journalEntry}}}
 
