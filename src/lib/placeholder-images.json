@@ -1,3 +1,28 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-image",
+      "description": "A person writing in a journal in a calm setting",
+      "imageUrl": "https://picsum.photos/seed/1/600/400",
+      "imageHint": "calm journal"
+    },
+    {
+      "id": "feature-mood-analysis",
+      "description": "Abstract representation of mood analysis",
+      "imageUrl": "https://picsum.photos/seed/2/400/300",
+      "imageHint": "mood analysis"
+    },
+    {
+      "id": "feature-coping-tips",
+      "description": "A lightbulb symbolizing a helpful tip",
+      "imageUrl": "https://picsum.photos/seed/3/400/300",
+      "imageHint": "helpful tip"
+    },
+    {
+      "id": "feature-progress-tracking",
+      "description": "A chart showing progress over time",
+      "imageUrl": "https://picsum.photos/seed/4/400/300",
+      "imageHint": "progress chart"
+    }
+  ]
 }

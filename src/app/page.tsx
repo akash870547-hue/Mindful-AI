@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowRight, BookText } from 'lucide-react';
+import { ArrowRight, BookText, BrainCircuit, HeartPulse, Lightbulb } from 'lucide-react';
 import Image from 'next/image';
 
 export default function Home() {
@@ -44,6 +44,89 @@ export default function Home() {
                 className="h-full w-full object-cover"
                 data-ai-hint="calm journal"
               />
+            </div>
+          </div>
+        </section>
+        <section className="bg-muted/40 py-16 md:py-24 lg:py-32">
+          <div className="container mx-auto px-4">
+            <div className="mx-auto max-w-3xl text-center">
+              <h3 className="font-headline text-3xl font-bold tracking-tighter sm:text-4xl">
+                How Mindful AI Supports You
+              </h3>
+              <p className="mt-4 text-lg text-muted-foreground">
+                Discover a new way to engage with your thoughts and feelings.
+              </p>
+            </div>
+            <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
+              <div className="flex flex-col overflow-hidden rounded-lg border bg-card shadow-lg">
+                <div className="relative h-48 w-full">
+                   <Image
+                    src="https://picsum.photos/seed/2/400/300"
+                    alt="Abstract representation of mood analysis"
+                    width={400}
+                    height={300}
+                    className="h-full w-full object-cover"
+                    data-ai-hint="mood analysis"
+                  />
+                </div>
+                <div className="flex-1 p-6">
+                  <div className="mb-4 flex items-center gap-3">
+                    <div className="rounded-full bg-primary/10 p-2 text-primary">
+                      <BrainCircuit className="h-6 w-6" />
+                    </div>
+                    <h4 className="font-headline text-xl font-semibold">AI Mood Analysis</h4>
+                  </div>
+                  <p className="text-muted-foreground">
+                    Our advanced AI reads your journal entries to identify your mood, helping you gain clarity on your emotional state.
+                  </p>
+                </div>
+              </div>
+               <div className="flex flex-col overflow-hidden rounded-lg border bg-card shadow-lg">
+                <div className="relative h-48 w-full">
+                   <Image
+                    src="https://picsum.photos/seed/3/400/300"
+                    alt="A lightbulb symbolizing a helpful tip"
+                    width={400}
+                    height={300}
+                    className="h-full w-full object-cover"
+                    data-ai-hint="helpful tip"
+                  />
+                </div>
+                <div className="flex-1 p-6">
+                  <div className="mb-4 flex items-center gap-3">
+                    <div className="rounded-full bg-primary/10 p-2 text-primary">
+                      <Lightbulb className="h-6 w-6" />
+                    </div>
+                    <h4 className="font-headline text-xl font-semibold">Personalized Tips</h4>
+                  </div>
+                  <p className="text-muted-foreground">
+                    Receive gentle, actionable coping tips tailored to your mood to help you navigate your feelings.
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-col overflow-hidden rounded-lg border bg-card shadow-lg">
+                <div className="relative h-48 w-full">
+                   <Image
+                    src="https://picsum.photos/seed/4/400/300"
+                    alt="A chart showing progress over time"
+                    width={400}
+                    height={300}
+                    className="h-full w-full object-cover"
+                    data-ai-hint="progress chart"
+                  />
+                </div>
+                <div className="flex-1 p-6">
+                  <div className="mb-4 flex items-center gap-3">
+                    <div className="rounded-full bg-primary/10 p-2 text-primary">
+                      <HeartPulse className="h-6 w-6" />
+                    </div>
+                    <h4 className="font-headline text-xl font-semibold">Track Your Journey</h4>
+                  </div>
+                  <p className="text-muted-foreground">
+                    Look back on previous entries to see your emotional patterns and progress over time.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </section>
