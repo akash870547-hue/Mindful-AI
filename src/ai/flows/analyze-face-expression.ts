@@ -39,11 +39,11 @@ const prompt = ai.definePrompt({
   prompt: `Analyze the facial expression in the following image to detect the user's mood.
 
 Based on the detected mood, provide:
-1.  **Mood**: Categorize the mood as "Mild", "Moderate", or "Severe" distress based on their expression (e.g., smiling/neutral -> Mild, frowning/sad -> Moderate, crying/anguish -> Severe).
-2.  **Mood Score**: Provide a numerical score from 0 to 100 indicating the intensity of the detected mood, based on the facial expression. A higher score means a more intense or severe mood.
+1.  **Mood**: Categorize the mood from the following list: "Happy", "Sad", "Angry", "Anxious", "Calm".
+2.  **Mood Score**: Provide a numerical score from 0 to 100 indicating the intensity of the detected mood. A higher score means a more intense or severe mood.
 3.  **Mental Solution**: Provide a short, actionable mental solution (like a mindfulness exercise or a coping strategy relevant to the expression).
 4.  **Physical Activity**: Provide a simple, accessible physical activity suggestion (e.g., a 5-minute walk, stretching).
-5.  **Emergency Message**: If the mood is "Severe", include a gentle and empathetic emergency alert message. For "Mild" or "Moderate" moods, this field MUST be null.
+5.  **Emergency Message**: If the expression indicates severe distress (e.g., anguish, crying, deep despair), include a gentle and empathetic emergency alert message. For all other moods, this field MUST be null.
 
 Photo: {{media url=photoDataUri}}
 

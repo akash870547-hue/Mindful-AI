@@ -4,8 +4,8 @@ import {Timestamp} from 'firebase/firestore';
 
 export const AnalyzeMoodOutputSchema = z.object({
   mood: z
-    .enum(['Mild', 'Moderate', 'Severe'])
-    .describe('The detected mood of the user (Mild, Moderate, or Severe).'),
+    .enum(['Happy', 'Sad', 'Angry', 'Anxious', 'Calm', 'Mild', 'Moderate', 'Severe'])
+    .describe('The detected mood of the user.'),
   moodScore: z
     .number()
     .min(0)
@@ -21,6 +21,7 @@ export const AnalyzeMoodOutputSchema = z.object({
     ),
   emergencyMessage: z
     .string()
+    .nullable()
     .optional()
     .describe(
       'An empathetic emergency alert message, only to be provided if the mood is detected as "Severe".'

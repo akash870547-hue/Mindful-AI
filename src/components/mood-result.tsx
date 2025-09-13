@@ -25,7 +25,13 @@ interface MoodResultProps {
   isLoading: boolean;
 }
 
-const moodStyling: Record<Mood, { text: string, bg: string, border: string, progress: string }> = {
+const moodStyling: Record<string, { text: string, bg: string, border: string, progress: string }> = {
+  Happy: { text: 'text-green-700', bg: 'bg-green-50', border: 'border-green-200', progress: 'bg-green-500' },
+  Calm: { text: 'text-blue-700', bg: 'bg-blue-50', border: 'border-blue-200', progress: 'bg-blue-500' },
+  Sad: { text: 'text-gray-700', bg: 'bg-gray-50', border: 'border-gray-200', progress: 'bg-gray-500' },
+  Anxious: { text: 'text-yellow-700', bg: 'bg-yellow-50', border: 'border-yellow-200', progress: 'bg-yellow-500' },
+  Angry: { text: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200', progress: 'bg-red-500' },
+  // Fallbacks for old data
   Mild: { text: 'text-green-700', bg: 'bg-green-50', border: 'border-green-200', progress: 'bg-green-500' },
   Moderate: { text: 'text-yellow-700', bg: 'bg-yellow-50', border: 'border-yellow-200', progress: 'bg-yellow-500' },
   Severe: { text: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200', progress: 'bg-red-500' },
@@ -55,7 +61,7 @@ export function MoodResult({ result, isLoading }: MoodResultProps) {
 
     setIsGeneratingSpeech(true);
     let textToRead = `Your mood has been analyzed as ${result.mood}. Here is a mental solution for you: ${result.mentalSolution}. And a physical activity you could try: ${result.physicalActivity}.`;
-    if (result.mood === 'Severe' && result.emergencyMessage) {
+    if (result.emergencyMessage) {
       textToRead += ` Also, please listen to this important message: ${result.emergencyMessage}`;
     }
     const speechResult = await getSpeech(textToRead);
@@ -169,7 +175,7 @@ export function MoodResult({ result, isLoading }: MoodResultProps) {
               <Progress value={result.moodScore} className={cn("h-3", styles.progress)} />
             </div>
            )}
-          {result.mood === 'Severe' && result.emergencyMessage && (
+          {result.emergencyMessage && (
             <Alert variant="destructive">
               <TriangleAlert className="h-4 w-4" />
               <AlertTitle>Important Message</AlertTitle>

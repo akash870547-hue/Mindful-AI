@@ -33,11 +33,11 @@ const prompt = ai.definePrompt({
   output: {schema: AnalyzeMoodOutputSchema},
   prompt: `Analyze the following journal entry to detect the user's mood.
 
-1.  **Mood**: Categorize the mood as "Mild", "Moderate", or "Severe" distress.
+1.  **Mood**: Categorize the mood from the following list: "Happy", "Sad", "Angry", "Anxious", "Calm".
 2.  **Mood Score**: Provide a numerical score from 0 to 100 indicating the intensity of the detected mood. A higher score means a more intense or severe mood.
 3.  **Mental Solution**: Provide a short, actionable mental solution (like a mindfulness exercise or a coping strategy).
 4.  **Physical Activity**: Provide a simple, accessible physical activity suggestion (e.g., a 5-minute walk, stretching).
-5.  **Emergency Message**: If the mood is "Severe", include a gentle and empathetic emergency alert message. For "Mild" or "Moderate" moods, this field MUST be null.
+5.  **Emergency Message**: If the journal entry indicates severe distress (e.g., mentions of self-harm, hopelessness, crisis), include a gentle and empathetic emergency alert message. For all other moods, this field MUST be null.
 
 Journal Entry: {{{journalEntry}}}
 

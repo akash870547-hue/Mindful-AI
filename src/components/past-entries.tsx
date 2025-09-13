@@ -20,7 +20,12 @@ interface PastEntriesListProps {
   entries: JournalEntry[];
 }
 
-const moodTextClass: Record<Mood, string> = {
+const moodTextClass: Record<string, string> = {
+  Happy: 'text-green-600',
+  Calm: 'text-blue-600',
+  Sad: 'text-gray-600',
+  Anxious: 'text-yellow-600',
+  Angry: 'text-red-600',
   Mild: 'text-green-600',
   Moderate: 'text-yellow-600',
   Severe: 'text-red-600',
