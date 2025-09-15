@@ -31,6 +31,7 @@ const moodTextClass: Record<string, string> = {
   Stressed: 'text-orange-600',
   Tired: 'text-indigo-600',
   Overwhelmed: 'text-pink-600',
+  'No Face Detected': 'text-gray-600',
   Mild: 'text-green-600',
   Moderate: 'text-yellow-600',
   Severe: 'text-red-600',
@@ -60,7 +61,7 @@ export function PastEntriesList({ entries }: PastEntriesListProps) {
                   <AccordionItem value={entry.id} key={entry.id} className="border-b-border/70">
                     <AccordionTrigger className="hover:no-underline">
                       <div className="flex items-center gap-4 w-full">
-                        <Icon className={`h-6 w-6 shrink-0 ${moodTextClass[mood]}`} />
+                        {Icon && <Icon className={`h-6 w-6 shrink-0 ${moodTextClass[mood]}`} />}
                         <div className="text-left flex-1">
                           <p className="font-semibold">
                             {format(entry.createdAt, 'MMMM d, yyyy')}
@@ -80,6 +81,7 @@ export function PastEntriesList({ entries }: PastEntriesListProps) {
                           {entry.journalEntry}
                         </p>
                       </div>
+                      {entry.mentalSolution && (
                        <div className="prose prose-sm max-w-none text-muted-foreground">
                         <h4 className="mb-1 font-headline text-lg font-semibold text-foreground">
                           Mental Solution
@@ -88,6 +90,8 @@ export function PastEntriesList({ entries }: PastEntriesListProps) {
                           {entry.mentalSolution}
                         </p>
                       </div>
+                      )}
+                      {entry.physicalActivity && (
                       <div className="prose prose-sm max-w-none text-muted-foreground">
                         <h4 className="mb-1 font-headline text-lg font-semibold text-foreground">
                           Physical Activity
@@ -96,6 +100,7 @@ export function PastEntriesList({ entries }: PastEntriesListProps) {
                           {entry.physicalActivity}
                         </p>
                       </div>
+                      )}
                       {entry.emergencyMessage && (
                          <div className="prose prose-sm max-w-none text-destructive/80">
                           <h4 className="mb-1 font-headline text-lg font-semibold text-destructive">

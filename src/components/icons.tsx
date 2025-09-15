@@ -1,4 +1,4 @@
-import { Smile, Meh, Frown, LucideProps, Angry, Annoyed, HandPlatter, Hand, Wind, BatteryFull, BrainCircuit, Waves } from 'lucide-react';
+import { Smile, Meh, Frown, LucideProps, Angry, Annoyed, HandPlatter, Hand, Wind, BatteryFull, BrainCircuit, Waves, UserX } from 'lucide-react';
 
 export const MoodIcons = {
   Happy: (props: LucideProps) => <Smile {...props} />,
@@ -10,6 +10,7 @@ export const MoodIcons = {
   Stressed: (props: LucideProps) => <Wind {...props} />,
   Tired: (props: LucideProps) => <BatteryFull {...props} className="rotate-90" />,
   Overwhelmed: (props: LucideProps) => <BrainCircuit {...props} />,
+  'No Face Detected': (props: LucideProps) => <UserX {...props} />,
   // Fallback for old data
   Mild: (props: LucideProps) => <Smile {...props} />,
   Moderate: (props: LucideProps) => <Meh {...props} />,

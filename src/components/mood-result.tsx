@@ -37,6 +37,7 @@ const moodStyling: Record<string, { text: string, bg: string, border: string, pr
   Stressed: { text: 'text-orange-700', bg: 'bg-orange-50', border: 'border-orange-200', progress: 'bg-orange-500' },
   Tired: { text: 'text-indigo-700', bg: 'bg-indigo-50', border: 'border-indigo-200', progress: 'bg-indigo-500' },
   Overwhelmed: { text: 'text-pink-700', bg: 'bg-pink-50', border: 'border-pink-200', progress: 'bg-pink-500' },
+  'No Face Detected': { text: 'text-gray-700', bg: 'bg-gray-50', border: 'border-gray-200', progress: 'bg-gray-500' },
   // Fallbacks for old data
   Mild: { text: 'text-green-700', bg: 'bg-green-50', border: 'border-green-200', progress: 'bg-green-500' },
   Moderate: { text: 'text-yellow-700', bg: 'bg-yellow-50', border: 'border-yellow-200', progress: 'bg-yellow-500' },
@@ -52,6 +53,14 @@ export function MoodResult({ result, isLoading, image }: MoodResultProps) {
 
   async function handlePlayAudio() {
     if (!result) return;
+     if (result.mood === 'No Face Detected') {
+        toast({
+            variant: 'default',
+            title: 'No Audio',
+            description: 'No analysis to read for this image.',
+        });
+        return;
+    }
 
     if (audioRef.current && audioRef.current.src) {
       if (isPlaying) {
@@ -149,7 +158,7 @@ export function MoodResult({ result, isLoading, image }: MoodResultProps) {
                   Analysis: <span className={styles.text}>{mood}</span>
                 </CardTitle>
                 <CardDescription className={cn(styles.text, "opacity-80")}>
-                  Here's what I gathered from your input.
+                  { mood === 'No Face Detected' ? 'Could not find a face in the image.' : "Here's what I gathered from your input."}
                 </CardDescription>
               </div>
             </div>
@@ -157,7 +166,7 @@ export function MoodResult({ result, isLoading, image }: MoodResultProps) {
               size="icon"
               variant="ghost"
               onClick={handlePlayAudio}
-              disabled={isGeneratingSpeech}
+              disabled={isGeneratingSpeech || mood === 'No Face Detected'}
               className={cn("h-12 w-12 shrink-0 rounded-full hover:bg-black/5", styles.text)}
             >
               {isGeneratingSpeech ? (
@@ -177,44 +186,53 @@ export function MoodResult({ result, isLoading, image }: MoodResultProps) {
                 <Image src={image} alt="Captured face for analysis" layout="fill" objectFit="cover" />
             </div>
            )}
-           {result.moodScore !== undefined && (
-            <div className="space-y-2">
-              <div className="flex justify-between font-headline text-lg">
-                <span className={cn('font-semibold', styles.text)}>Mood Intensity</span>
-                <span className={cn('font-bold', styles.text)}>{result.moodScore}%</span>
+
+           {mood !== 'No Face Detected' && (
+            <>
+              {result.moodScore !== undefined && (
+                <div className="space-y-2">
+                  <div className="flex justify-between font-headline text-lg">
+                    <span className={cn('font-semibold', styles.text)}>Mood Intensity</span>
+                    <span className={cn('font-bold', styles.text)}>{result.moodScore}%</span>
+                  </div>
+                  <Progress value={result.moodScore} className={cn("h-3", styles.progress)} />
+                </div>
+              )}
+              {result.emergencyMessage && (
+                <Alert variant="destructive">
+                  <TriangleAlert className="h-4 w-4" />
+                  <AlertTitle>Important Message</AlertTitle>
+                  <AlertDescription>
+                    {result.emergencyMessage}
+                  </AlertDescription>
+                </Alert>
+              )}
+              <div className='grid gap-6'>
+                {result.mentalSolution && (
+                  <div className="space-y-2">
+                    <h3 className="flex items-center gap-3 font-headline text-xl font-semibold">
+                      <Brain className="h-7 w-7 text-primary" />
+                      Mental Solution
+                    </h3>
+                    <p className="leading-relaxed text-card-foreground/90 pl-10">
+                      {result.mentalSolution}
+                    </p>
+                  </div>
+                )}
+                {result.physicalActivity && (
+                  <div className="space-y-2">
+                    <h3 className="flex items-center gap-3 font-headline text-xl font-semibold">
+                      <HeartPulse className="h-7 w-7 text-primary" />
+                      Physical Activity
+                    </h3>
+                    <p className="leading-relaxed text-card-foreground/90 pl-10">
+                      {result.physicalActivity}
+                    </p>
+                  </div>
+                )}
               </div>
-              <Progress value={result.moodScore} className={cn("h-3", styles.progress)} />
-            </div>
+            </>
            )}
-          {result.emergencyMessage && (
-            <Alert variant="destructive">
-              <TriangleAlert className="h-4 w-4" />
-              <AlertTitle>Important Message</AlertTitle>
-              <AlertDescription>
-                {result.emergencyMessage}
-              </AlertDescription>
-            </Alert>
-          )}
-          <div className='grid gap-6'>
-            <div className="space-y-2">
-              <h3 className="flex items-center gap-3 font-headline text-xl font-semibold">
-                <Brain className="h-7 w-7 text-primary" />
-                Mental Solution
-              </h3>
-              <p className="leading-relaxed text-card-foreground/90 pl-10">
-                {result.mentalSolution}
-              </p>
-            </div>
-            <div className="space-y-2">
-              <h3 className="flex items-center gap-3 font-headline text-xl font-semibold">
-                <HeartPulse className="h-7 w-7 text-primary" />
-                Physical Activity
-              </h3>
-              <p className="leading-relaxed text-card-foreground/90 pl-10">
-                {result.physicalActivity}
-              </p>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </>

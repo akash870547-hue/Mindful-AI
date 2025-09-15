@@ -38,8 +38,12 @@ const prompt = ai.definePrompt({
   output: { schema: AnalyzeMoodOutputSchema },
   prompt: `Analyze the facial expression in the following image to detect the user's mood.
 
+First, determine if a clear human face is visible.
+- If NO clear face is detected, you MUST respond with "No Face Detected" as the mood, a moodScore of 0, and null for all other fields.
+- If a face IS detected, proceed with the analysis.
+
 Based on the detected mood, provide:
-1.  **Mood**: Categorize the mood. It MUST be one of the following: "Happy", "Sad", "Angry", "Anxious", "Calm", "Grateful", "Stressed", "Tired", "Overwhelmed".
+1.  **Mood**: Categorize the mood. It MUST be one of the following: "Happy", "Sad", "Angry", "Anxious", "Calm", "Grateful", "Stressed", "Tired", "Overwhelmed", or "No Face Detected".
 2.  **Mood Score**: Provide a numerical score from 0 to 100 indicating the intensity of the detected mood. A higher score means a more intense or severe mood.
 3.  **Mental Solution**: Provide a short, actionable mental solution (like a mindfulness exercise or a coping strategy relevant to the expression).
 4.  **Physical Activity**: Provide a simple, accessible physical activity suggestion (e.g., a 5-minute walk, stretching).
