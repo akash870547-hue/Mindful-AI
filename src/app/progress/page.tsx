@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -23,7 +24,7 @@ export default function ProgressPage() {
     async function loadEntries() {
       setIsLoading(true);
       const fetchedEntries = await getJournalEntries();
-      setEntries(fetchedEntries.reverse()); // Reverse to show oldest first on the chart
+      setEntries(fetchedEntries);
       setIsLoading(false);
     }
     loadEntries();

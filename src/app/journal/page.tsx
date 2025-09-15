@@ -64,7 +64,7 @@ export default function JournalPage() {
         id: `optimistic-${Date.now()}`,
         createdAt: new Date(),
       };
-      setEntries(prevEntries => [optimisticEntry, ...prevEntries]);
+      setEntries(prevEntries => [...prevEntries, optimisticEntry]);
 
       // Save to DB in the background
       const saveResult = await saveJournalEntry(newEntryData);

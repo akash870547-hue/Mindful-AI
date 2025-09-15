@@ -1,3 +1,4 @@
+
 import {
   Accordion,
   AccordionContent,
@@ -32,6 +33,8 @@ const moodTextClass: Record<string, string> = {
 };
 
 export function PastEntriesList({ entries }: PastEntriesListProps) {
+  const reversedEntries = [...entries].reverse();
+  
   return (
     <Card className="h-full shadow-lg backdrop-blur-sm bg-card/80 sticky top-24">
       <CardHeader>
@@ -46,7 +49,7 @@ export function PastEntriesList({ entries }: PastEntriesListProps) {
         {entries.length > 0 ? (
           <ScrollArea className="h-[60vh] pr-4">
             <Accordion type="single" collapsible className="w-full">
-              {entries.map(entry => {
+              {reversedEntries.map(entry => {
                 const mood = entry.mood as Mood;
                 const Icon = MoodIcons[mood];
                 return (

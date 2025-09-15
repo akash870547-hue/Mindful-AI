@@ -111,7 +111,7 @@ export async function addJournalEntry(entry: Omit<JournalEntry, 'id' | 'createdA
 
 export async function getJournalEntries(): Promise<JournalEntry[]> {
     try {
-        const q = query(collection(db, "journalEntries"), orderBy("createdAt", "desc"));
+        const q = query(collection(db, "journalEntries"), orderBy("createdAt", "asc"));
         const querySnapshot = await getDocs(q);
         return querySnapshot.docs.map(doc => {
             const data = doc.data() as JournalEntryFromDb;
