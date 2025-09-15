@@ -19,10 +19,12 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
+import Image from 'next/image';
 
 interface MoodResultProps {
   result: AnalyzeMoodOutput | null;
   isLoading: boolean;
+  image?: string | null;
 }
 
 const moodStyling: Record<string, { text: string, bg: string, border: string, progress: string }> = {
@@ -42,7 +44,7 @@ const moodStyling: Record<string, { text: string, bg: string, border: string, pr
 };
 
 
-export function MoodResult({ result, isLoading }: MoodResultProps) {
+export function MoodResult({ result, isLoading, image }: MoodResultProps) {
   const [isGeneratingSpeech, setIsGeneratingSpeech] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -170,6 +172,11 @@ export function MoodResult({ result, isLoading }: MoodResultProps) {
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
+           {image && (
+            <div className="relative aspect-video w-full overflow-hidden rounded-lg border-2 border-dashed">
+                <Image src={image} alt="Captured face for analysis" layout="fill" objectFit="cover" />
+            </div>
+           )}
            {result.moodScore !== undefined && (
             <div className="space-y-2">
               <div className="flex justify-between font-headline text-lg">

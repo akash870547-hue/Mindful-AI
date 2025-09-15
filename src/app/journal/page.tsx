@@ -6,7 +6,7 @@ import { BookText } from 'lucide-react';
 import { JournalForm } from '@/components/journal-form';
 import { MoodResult } from '@/components/mood-result';
 import { PastEntriesList } from '@/components/past-entries';
-import { analyzeEntry, getJournalEntries, saveJournalEntry } from '@/app/actions';
+import { analyzeEntry, getJournalEntries, saveJournalEntry, analyzeFaceExpressionAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { JournalEntry, AnalyzeMoodOutput } from '@/lib/types';
 import Link from 'next/link';
@@ -20,6 +20,7 @@ export default function JournalPage() {
     null
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -29,6 +30,16 @@ export default function JournalPage() {
     }
     loadEntries();
   }, []);
+
+  async function handleFacialAnalysis(imageDataUri: string) {
+      setCapturedImage(imageDataUri);
+      await handleSubmit(analyzeFaceExpressionAction(imageDataUri));
+  }
+  
+  async function handleTextAnalysis(journalEntry: string) {
+      setCapturedImage(null);
+      await handleSubmit(analyzeEntry(journalEntry), journalEntry);
+  }
 
   async function handleSubmit(analysisPromise: Promise<{ data: AnalyzeMoodOutput | null; error: string | null }>, journalEntryText?: string) {
     setIsSubmitting(true);
@@ -116,11 +127,11 @@ export default function JournalPage() {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-5">
           <div className="space-y-8 lg:col-span-3">
             <JournalForm
-              onSubmit={(data) => handleSubmit(analyzeEntry(data.journalEntry), data.journalEntry)}
+              onSubmit={(data) => handleTextAnalysis(data.journalEntry)}
               isSubmitting={isSubmitting}
             />
-            <FacialAnalysis onSubmit={handleSubmit} isSubmitting={isSubmitting} />
-            <MoodResult result={currentResult} isLoading={isSubmitting} />
+            <FacialAnalysis onSubmit={handleFacialAnalysis} isSubmitting={isSubmitting} />
+            <MoodResult result={currentResult} isLoading={isSubmitting} image={capturedImage} />
           </div>
           <aside className="lg:col-span-2">
             <PastEntriesList entries={entries} />

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
@@ -5,12 +6,10 @@ import { Camera, Loader2, Video, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { AnalyzeMoodOutput } from '@/lib/types';
 import { Alert, AlertTitle, AlertDescription } from './ui/alert';
-import { analyzeFaceExpressionAction } from '@/app/actions';
 
 interface FacialAnalysisProps {
-  onSubmit: (analysisPromise: Promise<{ data: AnalyzeMoodOutput | null; error: string | null }>) => void;
+  onSubmit: (imageDataUri: string) => void;
   isSubmitting: boolean;
 }
 
@@ -83,7 +82,7 @@ export function FacialAnalysis({ onSubmit, isSubmitting }: FacialAnalysisProps) 
       context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
       const imageDataUri = canvas.toDataURL('image/jpeg');
       stopCamera();
-      onSubmit(analyzeFaceExpressionAction(imageDataUri));
+      onSubmit(imageDataUri);
     }
   };
 
