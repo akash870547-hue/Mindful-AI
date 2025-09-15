@@ -4,7 +4,7 @@ import {Timestamp} from 'firebase/firestore';
 
 export const AnalyzeMoodOutputSchema = z.object({
   mood: z
-    .enum(['Happy', 'Sad', 'Angry', 'Anxious', 'Calm', 'Mild', 'Moderate', 'Severe'])
+    .enum(['Happy', 'Sad', 'Angry', 'Anxious', 'Calm', 'Mild', 'Moderate', 'Severe', 'Grateful', 'Stressed', 'Tired', 'Overwhelmed'])
     .describe('The detected mood of the user.'),
   moodScore: z
     .number()
