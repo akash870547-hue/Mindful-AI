@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { HomeIcon, LineChart } from 'lucide-react';
 import { FacialAnalysis } from '@/components/facial-analysis';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function JournalPage() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
@@ -120,6 +121,7 @@ export default function JournalPage() {
                     <span className="sr-only">Progress</span>
                 </Link>
             </Button>
+            <ThemeToggle />
           </nav>
         </div>
       </header>

@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { getJournalEntries } from '@/app/actions';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function ProgressPage() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
@@ -50,6 +51,7 @@ export default function ProgressPage() {
                 Journal
               </Link>
             </Button>
+            <ThemeToggle />
           </nav>
         </div>
       </header>

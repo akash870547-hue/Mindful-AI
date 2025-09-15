@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowRight, BookText, BrainCircuit, Lightbulb, LineChart } from 'lucide-react';
 import Image from 'next/image';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 const FeatureCard = ({ href, icon: Icon, title, children }: { href: string; icon: React.ElementType; title: string; children: React.ReactNode }) => (
   <Link href={href} className="group block">
@@ -31,12 +32,13 @@ export default function Home() {
             <BookText className="h-8 w-8 text-primary" />
             <h1 className="font-headline text-3xl font-bold">Mental Health AI Companion</h1>
           </div>
+          <ThemeToggle />
         </div>
       </header>
 
       <main className="flex-1">
         <section className="relative overflow-hidden py-24 md:py-32 lg:py-40">
-           <div className="absolute inset-0 z-0 opacity-10">
+           <div className="absolute inset-0 z-0 opacity-10 dark:opacity-20">
                 <div className="absolute h-[300px] w-[300px] rounded-full bg-primary/50 blur-3xl -translate-x-1/2 -translate-y-1/2 top-1/4 left-1/4"></div>
                 <div className="absolute h-[300px] w-[300px] rounded-full bg-accent/50 blur-3xl translate-x-1/2 translate-y-1/2 bottom-1/4 right-1/4"></div>
             </div>
