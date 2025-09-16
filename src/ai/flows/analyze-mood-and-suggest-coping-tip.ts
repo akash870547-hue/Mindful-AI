@@ -60,7 +60,7 @@ Respond in a direct JSON format.`,
         category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
         threshold: 'BLOCK_MEDIUM_AND_ABOVE',
       },
-      {
+       {
         category: 'HARM_CATEGORY_CIVIC_INTEGRITY',
         threshold: 'BLOCK_MEDIUM_AND_ABOVE',
       },

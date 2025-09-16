@@ -33,7 +33,7 @@ export async function analyzeEntry(
     return {
       data: null,
       error:
-        "Sorry, I couldn't analyze your entry right now. Please try again later.",
+        "Sorry, I couldn't analyze your entry right now. The AI model returned an unexpected response. Please try again.",
     };
   }
 }
@@ -56,7 +56,7 @@ export async function analyzeFaceExpressionAction(
     return {
       data: null,
       error:
-        "Sorry, I couldn't analyze your expression right now. Please try again later.",
+        "Sorry, I couldn't analyze your expression right now. The AI model returned an unexpected response. Please try again.",
     };
   }
 }
