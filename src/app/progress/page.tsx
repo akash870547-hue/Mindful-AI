@@ -19,6 +19,17 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { Mood, MoodIcons } from '@/components/icons';
 import { Skeleton } from '@/components/ui/skeleton';
 
+const mockEntries: JournalEntry[] = [
+  { id: '1', journalEntry: "Feeling great today! Went for a walk and saw a beautiful sunset.", mood: 'Happy', moodScore: 85, createdAt: new Date('2024-07-15T09:00:00Z'), mentalSolution: null, physicalActivity: null, quote: null },
+  { id: '2', journalEntry: "A bit stressed with work deadlines. Feeling the pressure.", mood: 'Stressed', moodScore: 70, createdAt: new Date('2024-07-16T14:30:00Z'), mentalSolution: null, physicalActivity: null, quote: null },
+  { id: '3', journalEntry: "Had a calm and relaxing evening. Meditated for 10 minutes.", mood: 'Calm', moodScore: 30, createdAt: new Date('2024-07-17T21:00:00Z'), mentalSolution: null, physicalActivity: null, quote: null },
+  { id: '4', journalEntry: "Feeling anxious about the presentation tomorrow.", mood: 'Anxious', moodScore: 75, createdAt: new Date('2024-07-18T18:00:00Z'), mentalSolution: null, physicalActivity: null, quote: null },
+  { id: '5', journalEntry: "Feeling sad for no real reason. Just one of those days.", mood: 'Sad', moodScore: 60, createdAt: new Date('2024-07-19T11:00:00Z'), mentalSolution: null, physicalActivity: null, quote: null },
+  { id: '6', journalEntry: "So grateful for my friends. Had a wonderful call with my best friend.", mood: 'Grateful', moodScore: 20, createdAt: new Date('2024-07-20T20:00:00Z'), mentalSolution: null, physicalActivity: null, quote: null },
+  { id: '7', journalEntry: "Productive day today! Feeling accomplished and happy.", mood: 'Happy', moodScore: 90, createdAt: new Date('2024-07-21T17:00:00Z'), mentalSolution: null, physicalActivity: null, quote: null },
+];
+
+
 function getDashboardStats(entries: JournalEntry[]) {
     if (entries.length === 0) {
         return {
@@ -50,7 +61,11 @@ export default function ProgressPage() {
     async function loadEntries() {
       setIsLoading(true);
       const fetchedEntries = await getJournalEntries();
-      setEntries(fetchedEntries);
+      if (fetchedEntries.length > 0) {
+        setEntries(fetchedEntries);
+      } else {
+        setEntries(mockEntries);
+      }
       setIsLoading(false);
     }
     loadEntries();
