@@ -1,14 +1,8 @@
+
 'use client';
 
 import { TrendingUp } from 'lucide-react';
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import {
   ChartContainer,
   ChartTooltip,
@@ -23,41 +17,21 @@ interface MoodChartProps {
   isLoading: boolean;
 }
 
-const moodToValue: Record<string, number> = {
-  Mild: 1,
-  Moderate: 2,
-  Severe: 3,
-};
-
-const valueToMood: Record<number, string> = {
-  1: 'Mild',
-  2: 'Moderate',
-  3: 'Severe',
-};
-
 const chartConfig = {
-  mood: {
-    label: 'Mood',
-  },
-  mild: {
-    label: 'Mild',
-    color: 'hsl(var(--chart-2))',
-  },
-  moderate: {
-    label: 'Moderate',
-    color: 'hsl(var(--chart-4))',
-  },
-  severe: {
-    label: 'Severe',
-    color: 'hsl(var(--chart-1))',
+  moodScore: {
+    label: 'Mood Score',
+    color: 'hsl(var(--primary))',
   },
 };
 
 export function MoodChart({ data, isLoading }: MoodChartProps) {
-  const chartData = data.map(entry => ({
-    date: format(entry.createdAt, 'MMM d'),
-    mood: moodToValue[entry.mood],
-  }));
+  const chartData = data
+    .filter(entry => entry.moodScore !== undefined)
+    .map(entry => ({
+        date: format(new Date(entry.createdAt), 'MMM d'),
+        moodScore: entry.moodScore,
+        mood: entry.mood,
+    }));
 
   if (isLoading) {
     return (
@@ -67,11 +41,11 @@ export function MoodChart({ data, isLoading }: MoodChartProps) {
     )
   }
 
-  if (!data || data.length < 2) {
+  if (!chartData || chartData.length < 2) {
     return (
         <div className="flex h-[350px] w-full flex-col items-center justify-center rounded-lg border-2 border-dashed">
             <p className="text-muted-foreground">Not enough data to display a chart.</p>
-            <p className="text-sm text-muted-foreground">Make a few more journal entries.</p>
+            <p className="text-sm text-muted-foreground">Make at least two journal entries to see your progress.</p>
       </div>
     );
   }
@@ -88,7 +62,7 @@ export function MoodChart({ data, isLoading }: MoodChartProps) {
             top: 10,
           }}
         >
-          <CartesianGrid vertical={false} />
+          <CartesianGrid vertical={false} strokeDasharray="3 3" />
           <XAxis
             dataKey="date"
             tickLine={false}
@@ -100,21 +74,20 @@ export function MoodChart({ data, isLoading }: MoodChartProps) {
             tickLine={false}
             axisLine={false}
             tickMargin={8}
-            domain={[0.5, 3.5]}
-            ticks={[1, 2, 3]}
-            tickFormatter={(value) => valueToMood[value] || ''}
+            domain={[0, 100]}
+            tickFormatter={(value) => `${value}`}
           />
           <ChartTooltip
-            cursor={false}
+            cursor={true}
             content={
               <ChartTooltipContent
-                labelFormatter={(label, payload) => {
-                    if (payload && payload.length > 0) {
-                        return payload[0].payload.date;
-                    }
-                    return label;
-                }}
-                formatter={(value) => valueToMood[value as number]}
+                labelFormatter={(value) => value}
+                formatter={(value, name, props) => (
+                    <div>
+                        <p>Score: {value}%</p>
+                        <p>Mood: {props.payload.mood}</p>
+                    </div>
+                )}
                 indicator="dot"
               />
             }
@@ -123,22 +96,23 @@ export function MoodChart({ data, isLoading }: MoodChartProps) {
             <linearGradient id="fillMood" x1="0" y1="0" x2="0" y2="1">
               <stop
                 offset="5%"
-                stopColor="var(--color-severe)"
+                stopColor="var(--color-moodScore)"
                 stopOpacity={0.8}
               />
               <stop
                 offset="95%"
-                stopColor="var(--color-mild)"
+                stopColor="var(--color-moodScore)"
                 stopOpacity={0.1}
               />
             </linearGradient>
           </defs>
           <Area
-            dataKey="mood"
+            dataKey="moodScore"
             type="monotone"
             fill="url(#fillMood)"
-            stroke="var(--color-mood)"
+            stroke="var(--color-moodScore)"
             stackId="a"
+            strokeWidth={2}
           />
         </AreaChart>
       </ChartContainer>
