@@ -80,7 +80,7 @@ export default function ProgressPage() {
         <div className="container mx-auto flex h-20 items-center justify-between px-4">
           <div className="flex items-center gap-3">
             <BookText className="h-8 w-8 text-primary" />
-            <h1 className="font-headline text-3xl font-bold">Mental Health AI Companion</h1>
+            <h1 className="font-headline text-2xl md:text-3xl font-bold">Mental Health AI Companion</h1>
           </div>
           <nav className="flex items-center gap-2">
             <Button variant="ghost" asChild>
@@ -104,7 +104,7 @@ export default function ProgressPage() {
             Your Wellness Dashboard
           </h2>
 
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <Card className="shadow-lg">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Entries</CardTitle>
