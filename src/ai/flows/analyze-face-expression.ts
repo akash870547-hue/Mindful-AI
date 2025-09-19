@@ -6,14 +6,14 @@
  *
  * - analyzeFaceExpressionFlow - A function that handles the facial expression analysis.
  * - AnalyzeFaceExpressionInput - The input type for the analyzeFaceExpressionFlow function.
- * - AnalyzeMoodOutput - The return type, shared with the text-based mood analysis.
+ * - MoodAnalysis - The return type, shared with the text-based mood analysis.
  */
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import {
-  AnalyzeMoodOutput,
-  AnalyzeMoodOutputSchema,
+  MoodAnalysis,
+  MoodAnalysisSchema,
 } from '@/lib/types';
 
 const AnalyzeFaceExpressionInputSchema = z.object({
@@ -28,28 +28,23 @@ export type AnalyzeFaceExpressionInput = z.infer<typeof AnalyzeFaceExpressionInp
 
 export async function analyzeFaceExpression(
   input: AnalyzeFaceExpressionInput
-): Promise<AnalyzeMoodOutput> {
+): Promise<MoodAnalysis> {
   return analyzeFaceExpressionFlow(input);
 }
 
 const prompt = ai.definePrompt({
   name: 'analyzeFaceExpressionPrompt',
   input: { schema: AnalyzeFaceExpressionInputSchema },
-  output: { schema: AnalyzeMoodOutputSchema },
-  prompt: `Analyze the facial expression in the following image for a deep analysis of the user's mood.
+  output: { schema: MoodAnalysisSchema },
+  prompt: `Analyze the facial expression in the following image to determine the user's mood.
 
 First, determine if a clear human face is visible.
-- If NO clear face is detected, you MUST respond with "No Face Detected" as the mood, a moodScore of 0, and null for all other fields.
-- If a face IS detected, proceed with the deep analysis.
-
-Look for subtle cues in the user's expression (e.g., tension in the brow, the shape of the mouth). If the eyes are visible, pay close attention to the look in their eyes to inform your analysis.
+- If NO clear face is detected, you MUST respond with "No Face Detected" as the mood and a moodScore of 0.
+- If a face IS detected, proceed with the analysis.
 
 Based on the detected mood, provide:
 1.  **Mood**: Categorize the mood. It MUST be one of the following: "Happy", "Sad", "Angry", "Anxious", "Calm", "Grateful", "Stressed", "Tired", "Overwhelmed", "Nervous", or "No Face Detected".
 2.  **Mood Score**: Provide a numerical score from 0 to 100 indicating the intensity of the detected mood.
-3.  **Mental Solution**: Provide a short, actionable mental solution. Briefly reference a facial cue in your explanation (e.g., "I noticed some tension around your eyes, which suggests you're stressed. Try this..."). If you analyzed the eyes, incorporate that (e.g., "The weariness in your eyes suggests you're tired.").
-4.  **Physical Activity**: Provide a simple, accessible physical activity suggestion.
-5.  **Quote**: Provide an inspiring or reflective quote that is relevant to the user's mood. If 'No Face Detected', this must be null.
 
 Photo: {{media url=photoDataUri}}
 
@@ -84,7 +79,7 @@ const analyzeFaceExpressionFlow = ai.defineFlow(
   {
     name: 'analyzeFaceExpressionFlow',
     inputSchema: AnalyzeFaceExpressionInputSchema,
-    outputSchema: AnalyzeMoodOutputSchema,
+    outputSchema: MoodAnalysisSchema,
   },
   async (input) => {
     const { output } = await prompt(input);

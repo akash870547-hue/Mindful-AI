@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Mood, MoodIcons } from '@/components/icons';
-import { AnalyzeMoodOutput } from '@/lib/types';
+import { JournalEntry } from '@/lib/types';
 import { Volume2, Loader2, StopCircle, HeartPulse, Brain, Quote } from 'lucide-react';
 import { getSpeech } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
@@ -21,8 +21,9 @@ import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
 
 interface MoodResultProps {
-  result: AnalyzeMoodOutput | null;
+  result: Partial<JournalEntry> | null;
   isLoading: boolean;
+  isFetchingSuggestions: boolean;
   image?: string | null;
 }
 
@@ -45,14 +46,26 @@ const moodStyling: Record<string, { text: string, bg: string, border: string, pr
 };
 
 
-export function MoodResult({ result, isLoading, image }: MoodResultProps) {
+export function MoodResult({ result, isLoading, isFetchingSuggestions, image }: MoodResultProps) {
   const [isGeneratingSpeech, setIsGeneratingSpeech] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
+  const [hasPlayed, setHasPlayed] = useState(false);
+
+  // Reset audio when result changes
+  useEffect(() => {
+    if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+    }
+    setIsPlaying(false);
+    setHasPlayed(false);
+  }, [result]);
+
 
   async function handlePlayAudio() {
-    if (!result) return;
+    if (!result || !result.mood || isFetchingSuggestions || !result.mentalSolution) return;
      if (result.mood === 'No Face Detected') {
         toast({
             variant: 'default',
@@ -62,7 +75,7 @@ export function MoodResult({ result, isLoading, image }: MoodResultProps) {
         return;
     }
 
-    if (audioRef.current && audioRef.current.src) {
+    if (audioRef.current && audioRef.current.src && hasPlayed) {
       if (isPlaying) {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
@@ -87,6 +100,7 @@ export function MoodResult({ result, isLoading, image }: MoodResultProps) {
       });
     } else if (speechResult.data) {
       if (audioRef.current) {
+        setHasPlayed(true);
         audioRef.current.src = speechResult.data.audioDataUri;
         audioRef.current.play();
         setIsPlaying(true);
@@ -95,7 +109,7 @@ export function MoodResult({ result, isLoading, image }: MoodResultProps) {
   }
 
   const mood = result?.mood as Mood;
-  const Icon = result ? MoodIcons[mood] : null;
+  const Icon = result && result.mood ? MoodIcons[mood] : null;
 
   if (isLoading) {
     return (
@@ -155,7 +169,7 @@ export function MoodResult({ result, isLoading, image }: MoodResultProps) {
                   Analysis: <span className={styles.text}>{mood}</span>
                 </CardTitle>
                 <CardDescription className={cn(styles.text, "opacity-80")}>
-                  { mood === 'No Face Detected' ? 'Could not find a face in the image.' : "Here's what I gathered from your input."}
+                  { mood === 'No Face Detected' ? 'Could not find a face in the image.' : "Here's what I've gathered from your input."}
                 </CardDescription>
               </div>
             </div>
@@ -163,7 +177,7 @@ export function MoodResult({ result, isLoading, image }: MoodResultProps) {
               size="icon"
               variant="ghost"
               onClick={handlePlayAudio}
-              disabled={isGeneratingSpeech || mood === 'No Face Detected'}
+              disabled={isGeneratingSpeech || isFetchingSuggestions || mood === 'No Face Detected'}
               className={cn("h-12 w-12 shrink-0 rounded-full hover:bg-black/5", styles.text)}
             >
               {isGeneratingSpeech ? (
@@ -196,38 +210,57 @@ export function MoodResult({ result, isLoading, image }: MoodResultProps) {
                 </div>
               )}
               <div className='grid gap-6'>
-                {result.mentalSolution && (
-                  <div className="space-y-2">
-                    <h3 className="flex items-center gap-3 font-headline text-xl font-semibold">
-                      <Brain className="h-7 w-7 text-primary" />
-                      Mental Solution
-                    </h3>
-                    <p className="leading-relaxed text-card-foreground/90 pl-10">
-                      {result.mentalSolution}
-                    </p>
-                  </div>
-                )}
-                {result.physicalActivity && (
-                  <div className="space-y-2">
-                    <h3 className="flex items-center gap-3 font-headline text-xl font-semibold">
-                      <HeartPulse className="h-7 w-7 text-primary" />
-                      Physical Activity
-                    </h3>
-                    <p className="leading-relaxed text-card-foreground/90 pl-10">
-                      {result.physicalActivity}
-                    </p>
-                  </div>
-                )}
-                 {result.quote && (
-                  <div className="space-y-2">
-                    <h3 className="flex items-center gap-3 font-headline text-xl font-semibold">
-                      <Quote className="h-7 w-7 text-primary" />
-                      Food for Thought
-                    </h3>
-                    <blockquote className="leading-relaxed text-card-foreground/90 pl-10 italic border-l-4 border-primary/20 pl-4">
-                      {result.quote}
-                    </blockquote>
-                  </div>
+                {isFetchingSuggestions ? (
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                            <h3 className="flex items-center gap-3 font-headline text-xl font-semibold"><Brain className="h-7 w-7 text-primary" /> Mental Solution</h3>
+                            <Skeleton className="h-12 w-full" />
+                        </div>
+                         <div className="space-y-2">
+                            <h3 className="flex items-center gap-3 font-headline text-xl font-semibold"><HeartPulse className="h-7 w-7 text-primary" /> Physical Activity</h3>
+                            <Skeleton className="h-8 w-full" />
+                        </div>
+                        <div className="space-y-2">
+                            <h3 className="flex items-center gap-3 font-headline text-xl font-semibold"><Quote className="h-7 w-7 text-primary" /> Food for Thought</h3>
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                    </div>
+                ) : (
+                    <>
+                        {result.mentalSolution && (
+                        <div className="space-y-2">
+                            <h3 className="flex items-center gap-3 font-headline text-xl font-semibold">
+                            <Brain className="h-7 w-7 text-primary" />
+                            Mental Solution
+                            </h3>
+                            <p className="leading-relaxed text-card-foreground/90 pl-10">
+                            {result.mentalSolution}
+                            </p>
+                        </div>
+                        )}
+                        {result.physicalActivity && (
+                        <div className="space-y-2">
+                            <h3 className="flex items-center gap-3 font-headline text-xl font-semibold">
+                            <HeartPulse className="h-7 w-7 text-primary" />
+                            Physical Activity
+                            </h3>
+                            <p className="leading-relaxed text-card-foreground/90 pl-10">
+                            {result.physicalActivity}
+                            </p>
+                        </div>
+                        )}
+                        {result.quote && (
+                        <div className="space-y-2">
+                            <h3 className="flex items-center gap-3 font-headline text-xl font-semibold">
+                            <Quote className="h-7 w-7 text-primary" />
+                            Food for Thought
+                            </h3>
+                            <blockquote className="leading-relaxed text-card-foreground/90 italic border-l-4 border-primary/20 pl-4">
+                            {result.quote}
+                            </blockquote>
+                        </div>
+                        )}
+                    </>
                 )}
               </div>
             </>

@@ -2,22 +2,25 @@
 'use server';
 
 import {
-  analyzeMoodAndSuggestCopingTip
+  analyzeMood
 } from '@/ai/flows/analyze-mood-and-suggest-coping-tip';
 import {
   analyzeFaceExpression,
 } from '@/ai/flows/analyze-face-expression';
 import {
+    getSuggestionsForMood
+} from '@/ai/flows/get-mood-suggestions';
+import {
   textToSpeech,
   TextToSpeechOutput,
 } from '@/ai/flows/text-to-speech';
 import { db } from '@/lib/firebase/firebase';
-import { JournalEntry, JournalEntryFromDb, AnalyzeMoodOutput } from '@/lib/types';
+import { JournalEntry, JournalEntryFromDb, MoodAnalysis, MoodSuggestions } from '@/lib/types';
 import { collection, addDoc, getDocs, serverTimestamp, orderBy, query, Timestamp } from 'firebase/firestore';
 
 export async function analyzeEntry(
   journalEntry: string
-): Promise<{ data: AnalyzeMoodOutput | null; error: string | null }> {
+): Promise<{ data: MoodAnalysis | null; error: string | null }> {
   if (!journalEntry || journalEntry.trim().length < 10) {
     return {
       data: null,
@@ -26,7 +29,7 @@ export async function analyzeEntry(
   }
 
   try {
-    const result = await analyzeMoodAndSuggestCopingTip({ journalEntry });
+    const result = await analyzeMood({ journalEntry });
     return { data: result, error: null };
   } catch (e) {
     console.error(e);
@@ -40,7 +43,7 @@ export async function analyzeEntry(
 
 export async function analyzeFaceExpressionAction(
   photoDataUri: string
-): Promise<{ data: AnalyzeMoodOutput | null; error: string | null }> {
+): Promise<{ data: MoodAnalysis | null; error: string | null }> {
   if (!photoDataUri) {
     return {
       data: null,
@@ -60,6 +63,23 @@ export async function analyzeFaceExpressionAction(
     };
   }
 }
+
+export async function getSuggestions(
+    mood: string,
+    journalEntry?: string
+): Promise<{ data: MoodSuggestions | null; error: string | null }> {
+    try {
+        const result = await getSuggestionsForMood({ mood, journalEntry });
+        return { data: result, error: null };
+    } catch (e) {
+        console.error(e);
+        return {
+            data: null,
+            error: "Sorry, I couldn't generate suggestions right now. Please try again."
+        }
+    }
+}
+
 
 export async function saveJournalEntry(
   entry: Omit<JournalEntry, 'id' | 'createdAt'>

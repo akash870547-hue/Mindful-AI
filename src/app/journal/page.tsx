@@ -6,9 +6,9 @@ import { BookText } from 'lucide-react';
 import { JournalForm } from '@/components/journal-form';
 import { MoodResult } from '@/components/mood-result';
 import { PastEntriesList } from '@/components/past-entries';
-import { analyzeEntry, getJournalEntries, saveJournalEntry, analyzeFaceExpressionAction } from '@/app/actions';
+import { analyzeEntry, getJournalEntries, saveJournalEntry, analyzeFaceExpressionAction, getSuggestions } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
-import { JournalEntry, AnalyzeMoodOutput } from '@/lib/types';
+import { JournalEntry, MoodAnalysis, MoodSuggestions } from '@/lib/types';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { HomeIcon, LineChart } from 'lucide-react';
@@ -17,10 +17,10 @@ import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function JournalPage() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
-  const [currentResult, setCurrentResult] = useState<AnalyzeMoodOutput | null>(
-    null
-  );
+  const [currentAnalysis, setCurrentAnalysis] = useState<MoodAnalysis | null>(null);
+  const [currentSuggestions, setCurrentSuggestions] = useState<MoodSuggestions | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -33,72 +33,95 @@ export default function JournalPage() {
   }, []);
 
   async function handleFacialAnalysis(imageDataUri: string) {
-      setCapturedImage(imageDataUri);
-      await handleSubmit(analyzeFaceExpressionAction(imageDataUri));
+    setCapturedImage(imageDataUri);
+    await handleSubmit(analyzeFaceExpressionAction(imageDataUri));
   }
   
   async function handleTextAnalysis(journalEntry: string) {
-      setCapturedImage(null);
-      await handleSubmit(analyzeEntry(journalEntry), journalEntry);
+    setCapturedImage(null);
+    await handleSubmit(analyzeEntry(journalEntry), journalEntry);
   }
 
-  async function handleSubmit(analysisPromise: Promise<{ data: AnalyzeMoodOutput | null; error: string | null }>, journalEntryText?: string) {
+  async function handleSubmit(analysisPromise: Promise<{ data: MoodAnalysis | null; error: string | null }>, journalEntryText?: string) {
     setIsSubmitting(true);
-    setCurrentResult(null);
+    setCurrentAnalysis(null);
+    setCurrentSuggestions(null);
 
-    const result = await analysisPromise;
+    const analysisResult = await analysisPromise;
     setIsSubmitting(false);
 
-    if (result.error) {
+    if (analysisResult.error) {
       toast({
         variant: 'destructive',
         title: 'Analysis Error',
-        description: result.error,
+        description: analysisResult.error,
       });
       return;
     } 
     
-    if (result.data) {
-      setCurrentResult(result.data);
+    if (analysisResult.data) {
+      setCurrentAnalysis(analysisResult.data);
       
-      const newEntryData = {
+      // Start fetching suggestions in parallel
+      setIsFetchingSuggestions(true);
+      const suggestionsPromise = getSuggestions(analysisResult.data.mood, journalEntryText);
+      
+      // Don't wait for suggestions to save the entry
+      const newEntryData: Omit<JournalEntry, 'id' | 'createdAt'> = {
         journalEntry: journalEntryText || `Facial analysis on ${new Date().toLocaleString()}`,
-        mood: result.data.mood,
-        moodScore: result.data.moodScore,
-        mentalSolution: result.data.mentalSolution,
-        physicalActivity: result.data.physicalActivity,
-        quote: result.data.quote,
+        mood: analysisResult.data.mood,
+        moodScore: analysisResult.data.moodScore,
+        mentalSolution: null,
+        physicalActivity: null,
+        quote: null,
       };
 
-      // Optimistic update
       const optimisticEntry: JournalEntry = {
         ...newEntryData,
         id: `optimistic-${Date.now()}`,
         createdAt: new Date(),
       };
       setEntries(prevEntries => [...prevEntries, optimisticEntry]);
-
-      // Save to DB in the background
+      
       const saveResult = await saveJournalEntry(newEntryData);
 
-      if (saveResult.success && saveResult.id) {
-        // Update the optimistic entry with the real ID and timestamp from the server
-        setEntries(prevEntries => 
+      if (!saveResult.success) {
+          toast({ variant: 'destructive', title: 'Database Error', description: saveResult.error });
+          setEntries(prevEntries => prevEntries.filter(e => e.id !== optimisticEntry.id));
+          // Don't proceed if save fails
+          setIsFetchingSuggestions(false);
+          return;
+      }
+      
+      // Now, wait for suggestions
+      const suggestionsResult = await suggestionsPromise;
+      setIsFetchingSuggestions(false);
+
+      if (suggestionsResult.data) {
+        setCurrentSuggestions(suggestionsResult.data);
+
+        // Update the entry in the DB with the suggestions (async, no need to wait)
+        const fullEntryData = { ...newEntryData, ...suggestionsResult.data };
+        saveJournalEntry(fullEntryData);
+
+        // Update the optimistic entry with real ID and suggestions
+        setEntries(prevEntries =>
+          prevEntries.map(entry =>
+            entry.id === optimisticEntry.id ? { ...fullEntryData, id: saveResult.id!, createdAt: new Date(saveResult.createdAt!) } : entry
+          )
+        );
+      } else {
+         // Update optimistic entry with just the real ID if suggestions fail
+          setEntries(prevEntries => 
             prevEntries.map(entry => 
                 entry.id === optimisticEntry.id ? { ...entry, id: saveResult.id!, createdAt: new Date(saveResult.createdAt!) } : entry
             )
         );
-      } else {
-        // Rollback on failure
-        toast({
-          variant: 'destructive',
-          title: 'Database Error',
-          description: saveResult.error,
-        });
-        setEntries(prevEntries => prevEntries.filter(e => e.id !== optimisticEntry.id));
       }
     }
   }
+
+  const fullResult = currentAnalysis ? { ...currentAnalysis, ...currentSuggestions } : null;
 
   return (
     <div className="min-h-screen bg-background font-body text-foreground">
@@ -133,7 +156,7 @@ export default function JournalPage() {
               isSubmitting={isSubmitting}
             />
             <FacialAnalysis onSubmit={handleFacialAnalysis} isSubmitting={isSubmitting} />
-            <MoodResult result={currentResult} isLoading={isSubmitting} image={capturedImage} />
+            <MoodResult result={fullResult} isLoading={isSubmitting} isFetchingSuggestions={isFetchingSuggestions} image={capturedImage} />
           </div>
           <aside className="lg:col-span-2">
             <PastEntriesList entries={entries} />

@@ -2,18 +2,18 @@
 'use server';
 
 /**
- * @fileOverview Analyzes user's journal entry to detect mood and suggest coping strategies.
+ * @fileOverview Analyzes user's journal entry to detect mood.
  *
- * - analyzeMoodAndSuggestCopingTip - A function that handles the mood analysis and coping suggestion process.
- * - AnalyzeMoodInput - The input type for the analyzeMoodAndSuggestCopingTip function.
- * - AnalyzeMoodOutput - The return type for the analyzeMoodAndSuggestCopingTip function.
+ * - analyzeMood - A function that handles the mood analysis.
+ * - AnalyzeMoodInput - The input type for the analyzeMood function.
+ * - MoodAnalysis - The return type for the analyzeMood function.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import {
-  AnalyzeMoodOutput,
-  AnalyzeMoodOutputSchema,
+  MoodAnalysis,
+  MoodAnalysisSchema
 } from '@/lib/types';
 
 const AnalyzeMoodInputSchema = z.object({
@@ -21,23 +21,20 @@ const AnalyzeMoodInputSchema = z.object({
 });
 export type AnalyzeMoodInput = z.infer<typeof AnalyzeMoodInputSchema>;
 
-export async function analyzeMoodAndSuggestCopingTip(
+export async function analyzeMood(
   input: AnalyzeMoodInput
-): Promise<AnalyzeMoodOutput> {
+): Promise<MoodAnalysis> {
   return analyzeMoodFlow(input);
 }
 
 const prompt = ai.definePrompt({
   name: 'analyzeMoodPrompt',
   input: {schema: AnalyzeMoodInputSchema},
-  output: {schema: AnalyzeMoodOutputSchema},
+  output: {schema: MoodAnalysisSchema},
   prompt: `Analyze the following journal entry to detect the user's mood.
 
 1.  **Mood**: Categorize the mood. It MUST be one of the following: "Happy", "Sad", "Angry", "Anxious", "Calm", "Grateful", "Stressed", "Tired", "Overwhelmed", "Nervous".
 2.  **Mood Score**: Provide a numerical score from 0 to 100 indicating the intensity of the detected mood. A higher score means a more intense or severe mood.
-3.  **Mental Solution**: Provide a short, actionable mental solution (like a mindfulness exercise or a coping strategy).
-4.  **Physical Activity**: Provide a simple, accessible physical activity suggestion (e.g., a 5-minute walk, stretching).
-5.  **Quote**: Provide an inspiring or reflective quote that is relevant to the user's mood.
 
 Journal Entry: {{{journalEntry}}}
 
@@ -72,7 +69,7 @@ const analyzeMoodFlow = ai.defineFlow(
   {
     name: 'analyzeMoodFlow',
     inputSchema: AnalyzeMoodInputSchema,
-    outputSchema: AnalyzeMoodOutputSchema,
+    outputSchema: MoodAnalysisSchema,
   },
   async input => {
     const {output} = await prompt(input);
