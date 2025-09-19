@@ -5,6 +5,7 @@ export const MoodIcons = {
   Calm: (props: LucideProps) => <Waves {...props} />,
   Sad: (props: LucideProps) => <Frown {...props} />,
   Anxious: (props: LucideProps) => <Annoyed {...props} />,
+  Nervous: (props: LucideProps) => <Annoyed {...props} />,
   Angry: (props: LucideProps) => <Angry {...props} />,
   Grateful: (props: LucideProps) => <HandPlatter {...props} />,
   Stressed: (props: LucideProps) => <Wind {...props} />,

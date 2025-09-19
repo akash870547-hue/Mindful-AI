@@ -26,6 +26,7 @@ const moodTextClass: Record<string, string> = {
   Calm: 'text-blue-600',
   Sad: 'text-gray-600',
   Anxious: 'text-yellow-600',
+  Nervous: 'text-yellow-700',
   Angry: 'text-red-600',
   Grateful: 'text-purple-600',
   Stressed: 'text-orange-600',

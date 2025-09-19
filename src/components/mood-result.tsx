@@ -31,6 +31,7 @@ const moodStyling: Record<string, { text: string, bg: string, border: string, pr
   Calm: { text: 'text-blue-700', bg: 'bg-blue-50', border: 'border-blue-200', progress: 'bg-blue-500' },
   Sad: { text: 'text-gray-700', bg: 'bg-gray-50', border: 'border-gray-200', progress: 'bg-gray-500' },
   Anxious: { text: 'text-yellow-700', bg: 'bg-yellow-50', border: 'border-yellow-200', progress: 'bg-yellow-500' },
+  Nervous: { text: 'text-yellow-800', bg: 'bg-yellow-50', border: 'border-yellow-200', progress: 'bg-yellow-600' },
   Angry: { text: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200', progress: 'bg-red-500' },
   Grateful: { text: 'text-purple-700', bg: 'bg-purple-50', border: 'border-purple-200', progress: 'bg-purple-500' },
   Stressed: { text: 'text-orange-700', bg: 'bg-orange-50', border: 'border-orange-200', progress: 'bg-orange-500' },
