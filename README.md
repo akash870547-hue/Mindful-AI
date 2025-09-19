@@ -47,3 +47,4 @@ It analyzes user input with **Gemini AI**, detects depression levels (*Mild, Mod
    ```bash
    git clone https://github.com/akash870547-hue/mindful-ai.git
    cd mindful-ai
+# Mindful-AI-Updated
