@@ -62,7 +62,7 @@ Respond in a direct JSON format.`,
       },
       {
         category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-        threshold: 'BLOCK_ONLY_HIGH',
+        threshold: 'BLOCK_MEDIUM_AND_ABOVE',
       },
       {
         category: 'HARM_CATEGORY_HARASSMENT',
