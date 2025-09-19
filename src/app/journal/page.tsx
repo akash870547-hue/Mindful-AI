@@ -67,7 +67,6 @@ export default function JournalPage() {
         moodScore: result.data.moodScore,
         mentalSolution: result.data.mentalSolution,
         physicalActivity: result.data.physicalActivity,
-        emergencyMessage: result.data.emergencyMessage,
         quote: result.data.quote,
       };
 

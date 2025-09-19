@@ -21,13 +21,6 @@ export const AnalyzeMoodOutputSchema = z.object({
     .describe(
       'A simple physical activity suggestion (e.g., breathing exercise, walk, yoga).'
     ),
-  emergencyMessage: z
-    .string()
-    .nullable()
-    .optional()
-    .describe(
-      'An empathetic emergency alert message, only to be provided if the mood is detected as "Severe".'
-    ),
     quote: z
     .string()
     .nullable()
@@ -35,13 +28,13 @@ export const AnalyzeMoodOutputSchema = z.object({
     .describe('An inspiring or reflective quote relevant to the user\'s mood.'),
 });
 export type AnalyzeMoodOutput = z.infer<typeof AnalyzeMoodOutputSchema>;
-export interface JournalEntry extends AnalyzeMoodOutput {
+export interface JournalEntry extends Omit<AnalyzeMoodOutput, 'emergencyMessage'> {
   id: string;
   createdAt: Date;
   journalEntry: string;
 }
 
-export interface JournalEntryFromDb extends AnalyzeMoodOutput {
+export interface JournalEntryFromDb extends Omit<AnalyzeMoodOutput, 'emergencyMessage'> {
   id: string;
   createdAt: Timestamp;
   journalEntry: string;

@@ -13,10 +13,9 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Mood, MoodIcons } from '@/components/icons';
 import { AnalyzeMoodOutput } from '@/lib/types';
-import { Volume2, Loader2, StopCircle, HeartPulse, Brain, TriangleAlert, Quote } from 'lucide-react';
+import { Volume2, Loader2, StopCircle, HeartPulse, Brain, Quote } from 'lucide-react';
 import { getSpeech } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
@@ -76,9 +75,6 @@ export function MoodResult({ result, isLoading, image }: MoodResultProps) {
 
     setIsGeneratingSpeech(true);
     let textToRead = `Your mood has been analyzed as ${result.mood}. Here is a mental solution for you: ${result.mentalSolution}. And a physical activity you could try: ${result.physicalActivity}.`;
-    if (result.emergencyMessage) {
-      textToRead += ` Also, please listen to this important message: ${result.emergencyMessage}`;
-    }
     const speechResult = await getSpeech(textToRead);
     setIsGeneratingSpeech(false);
 
@@ -197,15 +193,6 @@ export function MoodResult({ result, isLoading, image }: MoodResultProps) {
                   </div>
                   <Progress value={result.moodScore} className={cn("h-3", styles.progress)} />
                 </div>
-              )}
-              {result.emergencyMessage && (
-                <Alert variant="destructive">
-                  <TriangleAlert className="h-4 w-4" />
-                  <AlertTitle>Important Message</AlertTitle>
-                  <AlertDescription>
-                    {result.emergencyMessage}
-                  </AlertDescription>
-                </Alert>
               )}
               <div className='grid gap-6'>
                 {result.mentalSolution && (

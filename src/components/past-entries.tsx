@@ -111,16 +111,6 @@ export function PastEntriesList({ entries }: PastEntriesListProps) {
                           </blockquote>
                         </div>
                       )}
-                      {entry.emergencyMessage && (
-                         <div className="prose prose-sm max-w-none text-destructive/80">
-                          <h4 className="mb-1 font-headline text-lg font-semibold text-destructive">
-                            Important Message
-                          </h4>
-                          <p className="leading-relaxed">
-                            {entry.emergencyMessage}
-                          </p>
-                        </div>
-                      )}
                     </AccordionContent>
                   </AccordionItem>
                 );
