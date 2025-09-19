@@ -28,6 +28,11 @@ export const AnalyzeMoodOutputSchema = z.object({
     .describe(
       'An empathetic emergency alert message, only to be provided if the mood is detected as "Severe".'
     ),
+    quote: z
+    .string()
+    .nullable()
+    .optional()
+    .describe('An inspiring or reflective quote relevant to the user\'s mood.'),
 });
 export type AnalyzeMoodOutput = z.infer<typeof AnalyzeMoodOutputSchema>;
 export interface JournalEntry extends AnalyzeMoodOutput {

@@ -101,6 +101,16 @@ export function PastEntriesList({ entries }: PastEntriesListProps) {
                         </p>
                       </div>
                       )}
+                      {entry.quote && (
+                        <div className="prose prose-sm max-w-none text-muted-foreground">
+                          <h4 className="mb-1 font-headline text-lg font-semibold text-foreground">
+                            Food for Thought
+                          </h4>
+                          <blockquote className="leading-relaxed italic">
+                            {entry.quote}
+                          </blockquote>
+                        </div>
+                      )}
                       {entry.emergencyMessage && (
                          <div className="prose prose-sm max-w-none text-destructive/80">
                           <h4 className="mb-1 font-headline text-lg font-semibold text-destructive">

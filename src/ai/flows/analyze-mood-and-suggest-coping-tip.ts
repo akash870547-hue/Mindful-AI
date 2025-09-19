@@ -38,6 +38,7 @@ const prompt = ai.definePrompt({
 3.  **Mental Solution**: Provide a short, actionable mental solution (like a mindfulness exercise or a coping strategy).
 4.  **Physical Activity**: Provide a simple, accessible physical activity suggestion (e.g., a 5-minute walk, stretching).
 5.  **Emergency Message**: If the journal entry indicates severe distress (e.g., mentions of self-harm, hopelessness, crisis), include a gentle and empathetic emergency alert message. For all other moods, this field MUST be null.
+6.  **Quote**: Provide an inspiring or reflective quote that is relevant to the user's mood.
 
 Journal Entry: {{{journalEntry}}}
 

@@ -46,10 +46,11 @@ Look for subtle cues in the user's expression (e.g., tension in the brow, the sh
 
 Based on the detected mood, provide:
 1.  **Mood**: Categorize the mood. It MUST be one of the following: "Happy", "Sad", "Angry", "Anxious", "Calm", "Grateful", "Stressed", "Tired", "Overwhelmed", or "No Face Detected".
-2.  **Mood Score**: Provide a numerical score from 0 to 100 indicating the intensity of the detected mood. A higher score means a more intense or severe mood.
+2.  **Mood Score**: Provide a numerical score from 0 to 100 indicating the intensity of the detected mood.
 3.  **Mental Solution**: Provide a short, actionable mental solution. Briefly reference a facial cue in your explanation (e.g., "I noticed some tension around your eyes, which suggests you're stressed. Try this..."). If you analyzed the eyes, incorporate that (e.g., "The weariness in your eyes suggests you're tired.").
 4.  **Physical Activity**: Provide a simple, accessible physical activity suggestion.
 5.  **Emergency Message**: If the expression indicates severe distress (e.g., anguish, crying, deep despair), include a gentle and empathetic emergency alert message. For all other moods, this field MUST be null.
+6.  **Quote**: Provide an inspiring or reflective quote that is relevant to the user's mood. If 'No Face Detected', this must be null.
 
 Photo: {{media url=photoDataUri}}
 

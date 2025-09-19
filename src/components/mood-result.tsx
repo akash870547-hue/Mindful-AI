@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Mood, MoodIcons } from '@/components/icons';
 import { AnalyzeMoodOutput } from '@/lib/types';
-import { Volume2, Loader2, StopCircle, HeartPulse, Brain, TriangleAlert } from 'lucide-react';
+import { Volume2, Loader2, StopCircle, HeartPulse, Brain, TriangleAlert, Quote } from 'lucide-react';
 import { getSpeech } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -228,6 +228,17 @@ export function MoodResult({ result, isLoading, image }: MoodResultProps) {
                     <p className="leading-relaxed text-card-foreground/90 pl-10">
                       {result.physicalActivity}
                     </p>
+                  </div>
+                )}
+                 {result.quote && (
+                  <div className="space-y-2">
+                    <h3 className="flex items-center gap-3 font-headline text-xl font-semibold">
+                      <Quote className="h-7 w-7 text-primary" />
+                      Food for Thought
+                    </h3>
+                    <blockquote className="leading-relaxed text-card-foreground/90 pl-10 italic border-l-4 border-primary/20 pl-4">
+                      {result.quote}
+                    </blockquote>
                   </div>
                 )}
               </div>
